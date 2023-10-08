@@ -46,7 +46,7 @@ stages:
       size: 266283626
   build_vectorstore:
     cmd: python src/stages/build_vectorstore.py data/processed/corpus.pkl data/processed/distilbert-base-tas-b-embedder.pkl
-      data/processed/chroma.db
+      data/processed/chroma
     deps:
     - path: data/processed/corpus.pkl
       hash: md5
@@ -61,18 +61,18 @@ stages:
       md5: 5b282c4bc85a04f03ebb25277acd317d
       size: 1079
     outs:
-    - path: data/processed/chroma.db
+    - path: data/processed/chroma
       hash: md5
-      md5: 916c9047849a5d00bec1c7840d86aebe.dir
+      md5: 73bc1d2a3cdb6c2f1a10ba21f6750724.dir
       size: 3429092
       nfiles: 5
   load_vectorstore:
-    cmd: python src/stages/load_vectorstore.py data/processed/chroma.db data/processed/distilbert-base-tas-b-embedder.pkl
+    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/distilbert-base-tas-b-embedder.pkl
       "Für was steht Maschinelles Lernen?"
     deps:
-    - path: data/processed/chroma.db
+    - path: data/processed/chroma
       hash: md5
-      md5: 809b3c2de34d25732f7dcffbd98c947a.dir
+      md5: d50ce7f6135816bd8d546d228b922f1c.dir
       size: 3429092
       nfiles: 5
     - path: data/processed/distilbert-base-tas-b-embedder.pkl

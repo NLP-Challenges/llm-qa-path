@@ -15,17 +15,17 @@ stages:
       - data/processed/distilbert-base-tas-b-embedder.pkl
 
   build_vectorstore:
-    cmd: python src/stages/build_vectorstore.py data/processed/corpus.pkl data/processed/distilbert-base-tas-b-embedder.pkl data/processed/chroma.db
+    cmd: python src/stages/build_vectorstore.py data/processed/corpus.pkl data/processed/distilbert-base-tas-b-embedder.pkl data/processed/chroma
     deps:
       - src/stages/build_vectorstore.py
       - data/processed/corpus.pkl
       - data/processed/distilbert-base-tas-b-embedder.pkl
     outs:
-      - data/processed/chroma.db
+      - data/processed/chroma
 
   load_vectorstore:
-    cmd: python src/stages/load_vectorstore.py data/processed/chroma.db data/processed/distilbert-base-tas-b-embedder.pkl "Für was steht Maschinelles Lernen?"
+    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/distilbert-base-tas-b-embedder.pkl "Für was steht Maschinelles Lernen?"
     deps:
       - src/stages/load_vectorstore.py
-      - data/processed/chroma.db
+      - data/processed/chroma
       - data/processed/distilbert-base-tas-b-embedder.pkl 
