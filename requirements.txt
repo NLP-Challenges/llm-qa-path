@@ -1,4 +1,11 @@
+--extra-index-url https://download.pytorch.org/whl/cu118
+torch
+torchvision
+torchaudio
+
 dvc==3.24.0
 langchain==0.0.310
 dill==0.3.7
 transformers==4.34.0
+sentence-transformers==2.2.2
+chromadb==0.4.13
