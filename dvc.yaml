@@ -1,8 +1,8 @@
 stages:
-  prepare:
-    cmd: python src/stages/text_splitter.py data/raw/example_context.txt data/processed/splitted.pkl
+  build_corpus:
+    cmd: python src/stages/build_corpus.py data/raw/example_context.txt data/processed/corpus.pkl
     deps:
-      - src/stages/text_splitter.py
+      - src/stages/build_corpus.py
       - data/raw/example_context.txt
     outs:
-      - data/processed/splitted.pkl
+      - data/processed/corpus.pkl

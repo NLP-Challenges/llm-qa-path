@@ -1,7 +1,7 @@
 schema: '2.0'
 stages:
   prepare:
-    cmd: python src/stages/text_splitter.py data/raw/example_context.txt data/processed/splitted.pkl
+    cmd: python src/stages/text_splitter.py data/raw/example_context.txt data/processed/corpus.pkl
     deps:
     - path: data/raw/example_context.txt
       hash: md5
@@ -12,7 +12,35 @@ stages:
       md5: 06b4876b99ea5b5cc0b6e2642c9f6839
       size: 819
     outs:
-    - path: data/processed/splitted.pkl
+    - path: data/processed/corpus.pkl
       hash: md5
       md5: ea38ce80f5991a76032ebf2d9d084efa
       size: 7366
+  build_corpus:
+    cmd: python src/stages/build_corpus.py data/raw/example_context.txt data/processed/corpus.pkl
+    deps:
+    - path: data/raw/example_context.txt
+      hash: md5
+      md5: 5491b618c90941c6ddb5c1c55c5be4ba
+      size: 7164
+    - path: src/stages/build_corpus.py
+      hash: md5
+      md5: a2f4c56e84488f487602137effdaaa19
+      size: 839
+    outs:
+    - path: data/processed/corpus.pkl
+      hash: md5
+      md5: ea38ce80f5991a76032ebf2d9d084efa
+      size: 7366
+  build_embedder:
+    cmd: python src/stages/build_embedder.py data/processed/distilbert-base-tas-b-embedder.pkl
+    deps:
+    - path: src/stages/build_embedder.py
+      hash: md5
+      md5: 502f93e87094e900fe916ae8d4a7756d
+      size: 697
+    outs:
+    - path: data/processed/distilbert-base-tas-b-embedder.pkl
+      hash: md5
+      md5: 8b1832c8ad228c1b994bac58f479cdef
+      size: 266283626
