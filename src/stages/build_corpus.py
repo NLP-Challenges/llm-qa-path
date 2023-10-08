@@ -1,6 +1,6 @@
 """
 Dieses Script is für das Einteilen von Text in Texblöcke (Corpus) zuständig.
-s
+
 Usage: script_name.py text_filename(input) curpus_filename(output)
 """
 

@@ -1,4 +1,3 @@
-/splitted.pkl
-/text_blocks_dict.pkl
 /corpus.pkl
 /distilbert-base-tas-b-embedder.pkl
+/chroma.db

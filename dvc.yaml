@@ -7,8 +7,8 @@ stages:
     outs:
       - data/processed/corpus.pkl
 
-  build_embedder:
-    cmd: python src/stages/build_embedder.py data/processed/distilbert-base-tas-b-embedder.pkl
+  build_embedder: #https://huggingface.co/sentence-transformers/msmarco-distilbert-base-tas-b
+    cmd: python src/stages/build_embedder.py "msmarco-distilbert-base-tas-b" data/processed/distilbert-base-tas-b-embedder.pkl
     deps:
       - src/stages/build_embedder.py
     outs:
