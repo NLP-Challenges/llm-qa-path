@@ -1,0 +1,18 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python src/stages/text_splitter.py data/raw/example_context.txt data/processed/splitted.pkl
+    deps:
+    - path: data/raw/example_context.txt
+      hash: md5
+      md5: 5491b618c90941c6ddb5c1c55c5be4ba
+      size: 7164
+    - path: src/stages/text_splitter.py
+      hash: md5
+      md5: 06b4876b99ea5b5cc0b6e2642c9f6839
+      size: 819
+    outs:
+    - path: data/processed/splitted.pkl
+      hash: md5
+      md5: ea38ce80f5991a76032ebf2d9d084efa
+      size: 7366

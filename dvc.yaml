@@ -1,0 +1,8 @@
+stages:
+  prepare:
+    cmd: python src/stages/text_splitter.py data/raw/example_context.txt data/processed/splitted.pkl
+    deps:
+      - src/stages/text_splitter.py
+      - data/raw/example_context.txt
+    outs:
+      - data/processed/splitted.pkl
