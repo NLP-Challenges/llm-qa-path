@@ -13,3 +13,12 @@ stages:
       - src/stages/build_embedder.py
     outs:
       - data/processed/distilbert-base-tas-b-embedder.pkl
+
+  build_vectorstore:
+    cmd: python src/stages/build_vectorstore.py data/processed/corpus.pkl data/processed/distilbert-base-tas-b-embedder.pkl data/processed/chroma.db
+    deps:
+      - src/stages/build_vectorstore.py
+      - data/processed/corpus.pkl
+      - data/processed/distilbert-base-tas-b-embedder.pkl
+    outs:
+      - data/processed/chroma.db
