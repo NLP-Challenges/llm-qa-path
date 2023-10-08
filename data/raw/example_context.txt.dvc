@@ -1,0 +1,5 @@
+outs:
+- md5: 5491b618c90941c6ddb5c1c55c5be4ba
+  size: 7164
+  hash: md5
+  path: example_context.txt
