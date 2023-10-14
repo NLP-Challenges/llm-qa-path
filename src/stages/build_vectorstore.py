@@ -7,7 +7,8 @@ Usage: script_name.py corpus_filename(input) embedder_filename(input) vector_dat
 
 from langchain.vectorstores import Chroma
 import argparse
-from dill import dump, load
+from dill import load
+import time
 
 parser = argparse.ArgumentParser()
 
@@ -34,3 +35,9 @@ with open(embedder_filename, 'rb') as f:
 #create vectorstore and save it to vector_database_filename
 db = Chroma.from_texts(corpus, embedder, persist_directory=vector_database_filename)
 db.persist()
+
+#disconnect from chroma
+del db
+
+#wait a sec to avoid simulateous access to files
+time.sleep(1)

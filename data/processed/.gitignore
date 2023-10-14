@@ -2,3 +2,4 @@
 /distilbert-base-tas-b-embedder.pkl
 /chroma.db
 /chroma
+/embedder.pkl

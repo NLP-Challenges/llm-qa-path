@@ -7,25 +7,25 @@ stages:
     outs:
       - data/processed/corpus.pkl
 
-  build_embedder: #https://huggingface.co/sentence-transformers/msmarco-distilbert-base-tas-b
-    cmd: python src/stages/build_embedder.py "msmarco-distilbert-base-tas-b" data/processed/distilbert-base-tas-b-embedder.pkl
+  build_embedder: #https://huggingface.co/sentence-transformers/distiluse-base-multilingual-cased-v1
+    cmd: python src/stages/build_embedder.py "sentence-transformers/distiluse-base-multilingual-cased-v1" data/processed/embedder.pkl
     deps:
       - src/stages/build_embedder.py
     outs:
-      - data/processed/distilbert-base-tas-b-embedder.pkl
+      - data/processed/embedder.pkl
 
   build_vectorstore:
-    cmd: python src/stages/build_vectorstore.py data/processed/corpus.pkl data/processed/distilbert-base-tas-b-embedder.pkl data/processed/chroma
+    cmd: python src/stages/build_vectorstore.py data/processed/corpus.pkl data/processed/embedder.pkl data/processed/chroma
     deps:
       - src/stages/build_vectorstore.py
       - data/processed/corpus.pkl
-      - data/processed/distilbert-base-tas-b-embedder.pkl
+      - data/processed/embedder.pkl
     outs:
       - data/processed/chroma
 
   load_vectorstore:
-    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/distilbert-base-tas-b-embedder.pkl "Für was steht Maschinelles Lernen?"
+    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl "Gib mir informationen über unsupervised learning."
     deps:
       - src/stages/load_vectorstore.py
       - data/processed/chroma
-      - data/processed/distilbert-base-tas-b-embedder.pkl 
+      - data/processed/embedder.pkl

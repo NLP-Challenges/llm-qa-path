@@ -7,7 +7,8 @@ Usage: script_name.py vector_database_filename(input) embedder_filename(input) q
 
 from langchain.vectorstores import Chroma
 import argparse
-from dill import dump, load
+from dill import load
+import time
 
 parser = argparse.ArgumentParser()
 
@@ -33,3 +34,9 @@ db = Chroma(persist_directory=vector_database_filename, embedding_function=embed
 # query
 docs = db.similarity_search(query)
 print(docs[0].page_content)
+
+#disconnect from chroma
+del db
+
+#wait a sec to avoid simulateous access to files
+time.sleep(1)

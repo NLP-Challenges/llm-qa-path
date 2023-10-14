@@ -6,6 +6,7 @@ Usage: script_name.py text_filename(input) curpus_filename(output)
 
 import argparse
 from dill import dump
+import time
 
 parser = argparse.ArgumentParser()
 
@@ -35,5 +36,8 @@ corpus = corpus[1:]
 
 with open(corpus_filename, "wb") as f:
     dump(corpus, f)
+
+#wait a sec to avoid simulateous access to files
+time.sleep(1)
 
 

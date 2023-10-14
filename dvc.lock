@@ -25,61 +25,62 @@ stages:
       size: 7164
     - path: src/stages/build_corpus.py
       hash: md5
-      md5: 6310738a48d61b42cf7ecf0b552f302e
-      size: 838
+      md5: 76f8ce2f4997acf627532affdc6369d5
+      size: 918
     outs:
     - path: data/processed/corpus.pkl
       hash: md5
       md5: ea38ce80f5991a76032ebf2d9d084efa
       size: 7366
   build_embedder:
-    cmd: python src/stages/build_embedder.py "msmarco-distilbert-base-tas-b" data/processed/distilbert-base-tas-b-embedder.pkl
+    cmd: python src/stages/build_embedder.py "sentence-transformers/distiluse-base-multilingual-cased-v1"
+      data/processed/embedder.pkl
     deps:
     - path: src/stages/build_embedder.py
       hash: md5
-      md5: 33534831eefb5c418bea4c6f423e10c2
-      size: 759
+      md5: 5f190a62a322f0413d8dfa7555898b85
+      size: 762
     outs:
-    - path: data/processed/distilbert-base-tas-b-embedder.pkl
+    - path: data/processed/embedder.pkl
       hash: md5
-      md5: bf5123c574716f5398125b543d29f02c
-      size: 266283626
+      md5: 00dba4efb02d5c93553612953a730482
+      size: 542838783
   build_vectorstore:
-    cmd: python src/stages/build_vectorstore.py data/processed/corpus.pkl data/processed/distilbert-base-tas-b-embedder.pkl
+    cmd: python src/stages/build_vectorstore.py data/processed/corpus.pkl data/processed/embedder.pkl
       data/processed/chroma
     deps:
     - path: data/processed/corpus.pkl
       hash: md5
       md5: ea38ce80f5991a76032ebf2d9d084efa
       size: 7366
-    - path: data/processed/distilbert-base-tas-b-embedder.pkl
+    - path: data/processed/embedder.pkl
       hash: md5
-      md5: bf5123c574716f5398125b543d29f02c
-      size: 266283626
+      md5: 00dba4efb02d5c93553612953a730482
+      size: 542838783
     - path: src/stages/build_vectorstore.py
       hash: md5
-      md5: 5b282c4bc85a04f03ebb25277acd317d
-      size: 1079
+      md5: ca9ea8e8d5a60b1ad9650399f52a66c2
+      size: 1194
     outs:
     - path: data/processed/chroma
       hash: md5
-      md5: 73bc1d2a3cdb6c2f1a10ba21f6750724.dir
-      size: 3429092
+      md5: bb0cac0acd43150c57b8f97b9ed4638a.dir
+      size: 2400996
       nfiles: 5
   load_vectorstore:
-    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/distilbert-base-tas-b-embedder.pkl
-      "Für was steht Maschinelles Lernen?"
+    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl
+      "Gib mir informationen über unsupervised learning."
     deps:
     - path: data/processed/chroma
       hash: md5
-      md5: d50ce7f6135816bd8d546d228b922f1c.dir
-      size: 3429092
+      md5: 1ce2a7ca212ef746e4f0e7ec57e87287.dir
+      size: 2400996
       nfiles: 5
-    - path: data/processed/distilbert-base-tas-b-embedder.pkl
+    - path: data/processed/embedder.pkl
       hash: md5
-      md5: bf5123c574716f5398125b543d29f02c
-      size: 266283626
+      md5: 00dba4efb02d5c93553612953a730482
+      size: 542838783
     - path: src/stages/load_vectorstore.py
       hash: md5
-      md5: e75a2f189241350ef48d7837d37679b5
-      size: 975
+      md5: 31ccce2bf9965e84da0b91c9d8ed3de6
+      size: 1090
