@@ -29,3 +29,10 @@ stages:
       - src/stages/load_vectorstore.py
       - data/processed/chroma
       - data/processed/embedder.pkl
+
+  build_ft_dataset: #https://huggingface.co/datasets/deepset/germanquad
+    cmd: python src/stages/build_ft_dataset.py data/processed/ft_dataset.hf
+    deps:
+      - src/stages/build_ft_dataset.py
+    outs:
+      - data/processed/ft_dataset.hf

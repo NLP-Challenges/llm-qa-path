@@ -10,3 +10,6 @@ dill==0.3.7
 transformers==4.34.0
 sentence-transformers==2.2.2
 chromadb==0.4.13
+datasets==2.14.5
+pandas==2.1.1
+matplotlib==3.8.0
