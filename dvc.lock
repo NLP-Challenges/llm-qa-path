@@ -1,21 +1,5 @@
 schema: '2.0'
 stages:
-  prepare:
-    cmd: python src/stages/text_splitter.py data/raw/example_context.txt data/processed/corpus.pkl
-    deps:
-    - path: data/raw/example_context.txt
-      hash: md5
-      md5: 5491b618c90941c6ddb5c1c55c5be4ba
-      size: 7164
-    - path: src/stages/text_splitter.py
-      hash: md5
-      md5: 06b4876b99ea5b5cc0b6e2642c9f6839
-      size: 819
-    outs:
-    - path: data/processed/corpus.pkl
-      hash: md5
-      md5: ea38ce80f5991a76032ebf2d9d084efa
-      size: 7366
   build_corpus:
     cmd: python src/stages/build_corpus.py data/raw/example_context.txt data/processed/corpus.pkl
     deps:
@@ -59,21 +43,21 @@ stages:
       size: 542838783
     - path: src/stages/build_vectorstore.py
       hash: md5
-      md5: ca9ea8e8d5a60b1ad9650399f52a66c2
-      size: 1194
+      md5: e4282f990112524267e168ce701b76de
+      size: 1188
     outs:
     - path: data/processed/chroma
       hash: md5
-      md5: bb0cac0acd43150c57b8f97b9ed4638a.dir
+      md5: 579077335e4ef92c55ffa260dfdf040b.dir
       size: 2400996
       nfiles: 5
   load_vectorstore:
     cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl
-      "Gib mir informationen über unsupervised learning."
+      "Wo braucht es einen agenten?"
     deps:
     - path: data/processed/chroma
       hash: md5
-      md5: 1ce2a7ca212ef746e4f0e7ec57e87287.dir
+      md5: af5cebd82b61b65a64af34476b6b4d13.dir
       size: 2400996
       nfiles: 5
     - path: data/processed/embedder.pkl
@@ -82,5 +66,5 @@ stages:
       size: 542838783
     - path: src/stages/load_vectorstore.py
       hash: md5
-      md5: 31ccce2bf9965e84da0b91c9d8ed3de6
-      size: 1090
+      md5: b603002a23c0a776aea65e89dfcbbba1
+      size: 1084

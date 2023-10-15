@@ -1,5 +1,6 @@
 [core]
     autostage = true
-    remote = remote_qa
-['remote "remote_qa"']
-    url = https://drive.google.com/drive/folders/1_Xn96w0ggCxu6Za3VzwVjwQ5u0vfNX2c?usp=drive_link
+    remote = chatbot-qa
+['remote "chatbot-qa"']
+    url = gdrive://1CwwO-yXbYWdBRa_bGjrp1aiXjGmV_epz/question-answer
+    gdrive_acknowledge_abuse = true

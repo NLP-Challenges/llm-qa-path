@@ -24,7 +24,7 @@ stages:
       - data/processed/chroma
 
   load_vectorstore:
-    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl "Gib mir informationen über unsupervised learning."
+    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl "Wo braucht es einen agenten?"
     deps:
       - src/stages/load_vectorstore.py
       - data/processed/chroma
