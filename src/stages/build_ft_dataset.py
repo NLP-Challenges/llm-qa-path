@@ -11,12 +11,12 @@ import datasets
 parser = argparse.ArgumentParser()
 
 #add positional arguments
-parser.add_argument('train_dataset_filename')
+parser.add_argument('dataset_filename')
 
 args = parser.parse_args()
 
 # Access the arguments
-train_dataset_filename = args.train_dataset_filename
+dataset_filename = args.dataset_filename
 
 
 #load germansquad dataset (train split) and convert to pandas dataframe
@@ -36,5 +36,5 @@ filtered_df.drop(columns="id", inplace=True)
 #reset index
 filtered_df.reset_index(drop=True, inplace=True)
 
-datasets.Dataset.from_pandas(filtered_df, split="train").save_to_disk(train_dataset_filename)
+datasets.Dataset.from_pandas(filtered_df, split="train").save_to_disk(dataset_filename)
 

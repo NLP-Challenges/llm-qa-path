@@ -57,7 +57,7 @@ stages:
     deps:
     - path: data/processed/chroma
       hash: md5
-      md5: 24a7d8a0aad5b949bb6c2f681eec4d27.dir
+      md5: 9a34a97c7475f17ea61ecef66c051757.dir
       size: 2400996
       nfiles: 5
     - path: data/processed/embedder.pkl
@@ -73,8 +73,8 @@ stages:
     deps:
     - path: src/stages/build_ft_dataset.py
       hash: md5
-      md5: a64fc742cf5e936561b5fbc86188c9e7
-      size: 1512
+      md5: 69c17dd2bd7d17844341841db5dbb06a
+      size: 1488
     outs:
     - path: data/processed/ft_dataset.hf
       hash: md5
