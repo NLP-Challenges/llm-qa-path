@@ -85,10 +85,8 @@ training_args = TrainingArguments(
     gradient_accumulation_steps=4,
     learning_rate=2e-4,
     logging_steps=1,
-    max_steps=4,
-    report_to="wandb",
-    optim="paged_adamw_32bit",
-    fp16=True
+    max_steps=25,
+    report_to="wandb"
 )
 
 trainer = SFTTrainer(

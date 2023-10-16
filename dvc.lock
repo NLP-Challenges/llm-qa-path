@@ -78,9 +78,9 @@ stages:
     outs:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: 094a8d216f97b748083d1e44fa9e4680.dir
-      size: 16029946
-      nfiles: 3
+      md5: 0ed577e36ec6525a4469f6bbc131f2fe.dir
+      size: 76707258
+      nfiles: 5
   train_llm:
     cmd: python src/stages/train_llm.py data/processed/ft_dataset.hf
     deps:
