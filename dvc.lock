@@ -81,3 +81,15 @@ stages:
       md5: 094a8d216f97b748083d1e44fa9e4680.dir
       size: 16029946
       nfiles: 3
+  train_llm:
+    cmd: python src/stages/train_llm.py data/processed/ft_dataset.hf
+    deps:
+    - path: data/processed/ft_dataset.hf
+      hash: md5
+      md5: 04b4be462f70c90fedb0e430fcf9313c.dir
+      size: 50218562
+      nfiles: 4
+    - path: src/stages/train_llm.py
+      hash: md5
+      md5: 7a486dc423b0ccf74ca71651c586f674
+      size: 2731

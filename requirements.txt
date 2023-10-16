@@ -17,4 +17,9 @@ trl==0.7.2
 peft==0.5.0
 python-dotenv==1.0.0
 wandb==0.15.12
-bitsandbytes==0.41.1
+#bitsandbytes==0.41.1 # only works for linux, macos ....why....(sad emoji here)
+
+#windows workaround
+--extra-index-url https://jllllll.github.io/bitsandbytes-windows-webui
+--prefer-binary
+bitsandbytes

@@ -9,7 +9,7 @@ import os
 
 #load hugging-face token
 load_dotenv()
-hf_token = os.environ["HUGGINGFACE_TOKEN"]
+hf_token = os.environ["HF_ACCESS_TOKEN"]
 
 #set wandb environment variables
 os.environ["WANDB_ENTITY"] = "t_buess"
@@ -30,14 +30,14 @@ max_seq_length = 4096
 
 def formatter(example):
     prompt = (
-        "Nachfolgend ist eine Frage gestellt mit dem entsprechenden Kontext sowie der passenden Antwort",
-        "Schreibe eine passende Antwort zur Frage und beziehe den Kontext mit hinein",
-        "### Frage:\n",
-        f"{example['question']}\n\n",
-        "### Kontext:\n",
-        f"{example['context']}\n\n",
-        "### Antwort:\n",
-        f"{example['answers']}",
+        "Nachfolgend ist eine Frage gestellt mit dem entsprechenden Kontext sowie der passenden Antwort"
+        "Schreibe eine passende Antwort zur Frage und beziehe den Kontext mit hinein"
+        "### Frage:\n"
+        f"{example['question']}\n\n"
+        "### Kontext:\n"
+        f"{example['context']}\n\n"
+        "### Antwort:\n"
+        f"{example['answers']}"
     )
 
     return {"text": prompt}
@@ -51,7 +51,7 @@ train_dataset = train_dataset.map(formatter)
 #according to https://medium.com/@ud.chandra/instruction-fine-tuning-llama-2-with-pefts-qlora-method-d6a801ebb19 & https://www.youtube.com/watch?v=eTieetk2dSw
 
 peft_config = LoraConfig(
-    r=16,
+    r=8,
     lora_alpha=32,
     lora_dropout=0.1,
     bias="none",
@@ -69,19 +69,23 @@ base_model = AutoModelForCausalLM.from_pretrained(
     model_name,
     quantization_config=bnb_config,
     device_map="cuda:0",
-    use_auth_token=hf_token
+    token=hf_token
 )
 
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-tokenizer.pad_token = "[PAD]"
+tokenizer = AutoTokenizer.from_pretrained(
+    model_name,
+    token=hf_token
+)
+tokenizer.pad_token = tokenizer.eos_token
+tokenizer.padding_side = "right"
 
 training_args = TrainingArguments(
     output_dir="data/processed/training-output",
-    per_device_train_batch_size=1,
+    per_device_train_batch_size=2,
     gradient_accumulation_steps=4,
     learning_rate=2e-4,
-    logging_steps=10,
-    max_steps=500,
+    logging_steps=1,
+    max_steps=50,
     report_to="wandb",
     fp16=True
 )
