@@ -36,9 +36,3 @@ stages:
       - src/stages/build_ft_dataset.py
     outs:
       - data/processed/ft_dataset.hf
-
-  train_llm: 
-    cmd: python src/stages/train_llm.py data/processed/ft_dataset.hf
-    deps:
-      - src/stages/train_llm.py
-      - data/processed/ft_dataset.hf
