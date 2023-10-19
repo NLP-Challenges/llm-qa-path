@@ -36,3 +36,13 @@ stages:
       - src/stages/build_ft_dataset.py
     outs:
       - data/processed/ft_dataset.hf
+
+  train_llm:
+    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset.hf ./data/models/llama2-fine-tuned_1
+    deps:
+      - src/stages/train_llm.py
+      - data/processed/ft_dataset.hf
+    params:
+      - train_llm
+    outs:
+      - ./data/models/llama2-fine-tuned_1
