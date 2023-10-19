@@ -1,7 +1,7 @@
 """
 Dieses Script is für das Training eines llms verantwortlich.
 
-Usage: script_name.py
+Usage: script_name.py params_parent_field(input) train_dataset_filename(input) ft_output_path(output)
 """
 
 import argparse

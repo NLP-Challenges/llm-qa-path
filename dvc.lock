@@ -82,7 +82,7 @@ stages:
       size: 16029946
       nfiles: 3
   train_llm:
-    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset.hf ./data/models/llama2-fine-tuned_1
+    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset.hf ./data/models/llama2-qa-fine-tuned
     deps:
     - path: data/processed/ft_dataset.hf
       hash: md5
@@ -91,8 +91,8 @@ stages:
       nfiles: 5
     - path: src/stages/train_llm.py
       hash: md5
-      md5: aca4c53b8d2d71d5f4412c5abe8ec18f
-      size: 4200
+      md5: 4f76c5aa72607dc07e41da971f3fd33f
+      size: 4280
     params:
       params.yaml:
         train_llm:
@@ -107,7 +107,7 @@ stages:
             grad_accumulation_steps: 8
             optimizer: paged_adamw_32bit
             learning_rate: 0.0001
-            max_steps: 5
+            max_steps: 50
             device_map: auto
           LoraConfig:
             r: 16
@@ -121,8 +121,33 @@ stages:
             bnb_4bit_quant_type: nf4
             bnb_4bit_compute_dtype: torch.bfloat16
     outs:
-    - path: ./data/models/llama2-fine-tuned_1
+    - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 2d85c8612fb6223aaebf1492989cb7c2.dir
+      md5: a8d93e07147ba465a6f6a7a53803179b.dir
       size: 35945559
       nfiles: 8
+  load_llm:
+    cmd: python src/stages/load_llm.py ./data/models/llama2-qa-fine-tuned "Wann wurde
+      Python erfunden?" "Die Sprache wurde Anfang der 1990er Jahre von Guido van Rossum
+      am Centrum Wiskunde & Informatica in Amsterdam als Nachfolger für die Programmier-Lehrsprache
+      ABC entwickelt und war ursprünglich für das verteilte Betriebssystem Amoeba
+      gedacht. Der Name geht nicht, wie das Logo vermuten lässt, auf die gleichnamige
+      Schlangengattung Python zurück, sondern bezog sich ursprünglich auf die englische
+      Komikergruppe Monty Python. In der Dokumentation finden sich daher auch einige
+      Anspielungen auf Sketche aus dem Flying Circus. Trotzdem etablierte sich die
+      Assoziation zur Schlange, was sich unter anderem in der Programmiersprache Cobra[16]
+      sowie dem Python-Toolkit „Boa“[17] äußert. Die erste Vollversion erschien im
+      Januar 1994 unter der Bezeichnung Python 1.0. Gegenüber früheren Versionen wurden
+      einige Konzepte der funktionalen Programmierung implementiert, die allerdings
+      später wieder aufgegeben wurden.[18] Von 1995 bis 2000 erschienen neue Versionen,
+      die fortlaufend als Python 1.1, 1.2 etc. bezeichnet wurden."
+    deps:
+    - path: ./data/models/llama2-qa-fine-tuned
+      hash: md5
+      md5: a8d93e07147ba465a6f6a7a53803179b.dir
+      size: 35945559
+      nfiles: 8
+    - path: src/stages/load_llm.py
+      hash: md5
+      md5: c00fc9d2564db952799526b000b9c632
+      size: 2371
