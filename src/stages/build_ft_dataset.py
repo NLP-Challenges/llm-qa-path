@@ -7,6 +7,7 @@ import argparse
 from datasets import load_dataset
 import pandas as pd
 import datasets
+import time
 
 parser = argparse.ArgumentParser()
 
@@ -37,4 +38,7 @@ filtered_df.drop(columns="id", inplace=True)
 filtered_df.reset_index(drop=True, inplace=True)
 
 datasets.Dataset.from_pandas(filtered_df, split="train").save_to_disk(dataset_filename)
+
+#wait a sec to avoid simulateous access to files
+time.sleep(1)
 

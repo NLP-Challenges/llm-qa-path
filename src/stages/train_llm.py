@@ -131,3 +131,6 @@ fine_tuning.train()
 ## Save model and tokenizer
 fine_tuning.model.save_pretrained(finetuned_path + "/model")
 fine_tuning.tokenizer.save_pretrained(finetuned_path + "/tokenizer")
+
+#wait a sec to avoid simulateous access to files
+time.sleep(1)

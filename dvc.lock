@@ -5,8 +5,8 @@ stages:
     deps:
     - path: data/raw/example_context.txt
       hash: md5
-      md5: 5491b618c90941c6ddb5c1c55c5be4ba
-      size: 7164
+      md5: 6f1ec549bb9074a2fe151ca623eca5c8
+      size: 7161
     - path: src/stages/build_corpus.py
       hash: md5
       md5: 76f8ce2f4997acf627532affdc6369d5
@@ -14,8 +14,8 @@ stages:
     outs:
     - path: data/processed/corpus.pkl
       hash: md5
-      md5: ea38ce80f5991a76032ebf2d9d084efa
-      size: 7366
+      md5: c5bff24c94fd2a5433666630fa7bc3f2
+      size: 7363
   build_embedder:
     cmd: python src/stages/build_embedder.py "sentence-transformers/distiluse-base-multilingual-cased-v1"
       data/processed/embedder.pkl
@@ -27,20 +27,20 @@ stages:
     outs:
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: 00dba4efb02d5c93553612953a730482
-      size: 542838783
+      md5: c1ff39d790a2ae28be9b0c976a0aa5d0
+      size: 542838819
   build_vectorstore:
     cmd: python src/stages/build_vectorstore.py data/processed/corpus.pkl data/processed/embedder.pkl
       data/processed/chroma
     deps:
     - path: data/processed/corpus.pkl
       hash: md5
-      md5: ea38ce80f5991a76032ebf2d9d084efa
-      size: 7366
+      md5: c5bff24c94fd2a5433666630fa7bc3f2
+      size: 7363
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: 00dba4efb02d5c93553612953a730482
-      size: 542838783
+      md5: c1ff39d790a2ae28be9b0c976a0aa5d0
+      size: 542838819
     - path: src/stages/build_vectorstore.py
       hash: md5
       md5: e4282f990112524267e168ce701b76de
@@ -48,7 +48,7 @@ stages:
     outs:
     - path: data/processed/chroma
       hash: md5
-      md5: 579077335e4ef92c55ffa260dfdf040b.dir
+      md5: 0563712d6bdc2a248538c3a05b0482d9.dir
       size: 2400996
       nfiles: 5
   load_vectorstore:
@@ -57,13 +57,13 @@ stages:
     deps:
     - path: data/processed/chroma
       hash: md5
-      md5: 9a34a97c7475f17ea61ecef66c051757.dir
+      md5: c0396e3ebf9fddda169345451ffa4bc0.dir
       size: 2400996
       nfiles: 5
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: 00dba4efb02d5c93553612953a730482
-      size: 542838783
+      md5: c1ff39d790a2ae28be9b0c976a0aa5d0
+      size: 542838819
     - path: src/stages/load_vectorstore.py
       hash: md5
       md5: b603002a23c0a776aea65e89dfcbbba1
@@ -73,23 +73,56 @@ stages:
     deps:
     - path: src/stages/build_ft_dataset.py
       hash: md5
-      md5: 69c17dd2bd7d17844341841db5dbb06a
-      size: 1488
+      md5: e39f0ee592bc35412be4f71da5886f06
+      size: 1568
     outs:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: 0ed577e36ec6525a4469f6bbc131f2fe.dir
-      size: 76707258
-      nfiles: 5
+      md5: 094a8d216f97b748083d1e44fa9e4680.dir
+      size: 16029946
+      nfiles: 3
   train_llm:
-    cmd: python src/stages/train_llm.py data/processed/ft_dataset.hf
+    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset.hf ./data/models/llama2-fine-tuned_1
     deps:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: 0ed577e36ec6525a4469f6bbc131f2fe.dir
-      size: 76707258
+      md5: 83264110ffe337db3fa5c022a5496c9f.dir
+      size: 76802370
       nfiles: 5
     - path: src/stages/train_llm.py
       hash: md5
-      md5: 3b2f42c7afec12af8401c86973d6c0b5
-      size: 2866
+      md5: aca4c53b8d2d71d5f4412c5abe8ec18f
+      size: 4200
+    params:
+      params.yaml:
+        train_llm:
+          wandb_params:
+            entity: t_buess
+            project: chatbot-qa
+          model_params:
+            base_model_id: meta-llama/Llama-2-7b-hf
+            max_seq_length: 4096
+          training_config:
+            batch_size: 1
+            grad_accumulation_steps: 8
+            optimizer: paged_adamw_32bit
+            learning_rate: 0.0001
+            max_steps: 5
+            device_map: auto
+          LoraConfig:
+            r: 16
+            lora_alpha: 16
+            lora_dropout: 0.05
+            bias: none
+            task_type: CAUSAL_LM
+          BitsAndBytesConfig:
+            load_in_4bit: true
+            bnb_4bit_use_double_quant: true
+            bnb_4bit_quant_type: nf4
+            bnb_4bit_compute_dtype: torch.bfloat16
+    outs:
+    - path: ./data/models/llama2-fine-tuned_1
+      hash: md5
+      md5: 2d85c8612fb6223aaebf1492989cb7c2.dir
+      size: 35945559
+      nfiles: 8

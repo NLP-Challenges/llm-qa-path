@@ -1,6 +1,4 @@
 /corpus.pkl
-/distilbert-base-tas-b-embedder.pkl
-/chroma.db
-/chroma
 /embedder.pkl
+/chroma
 /ft_dataset.hf

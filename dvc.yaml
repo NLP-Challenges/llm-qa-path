@@ -23,12 +23,12 @@ stages:
     outs:
       - data/processed/chroma
 
-  #load_vectorstore:
-  #  cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl "Wo braucht es einen agenten?"
-  #  deps:
-  #    - src/stages/load_vectorstore.py
-  #    - data/processed/chroma
-  #    - data/processed/embedder.pkl
+  load_vectorstore:
+    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl "Wo braucht es einen agenten?"
+    deps:
+      - src/stages/load_vectorstore.py
+      - data/processed/chroma
+      - data/processed/embedder.pkl
 
   build_ft_dataset: #https://huggingface.co/datasets/deepset/germanquad
     cmd: python src/stages/build_ft_dataset.py data/processed/ft_dataset.hf
