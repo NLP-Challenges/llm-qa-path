@@ -99,7 +99,7 @@ def formatter(example):
     return {"text": prompt}
 
 #load train dataset
-train_dataset = load_from_disk(ft_dataset_filename)
+train_dataset = load_from_disk(ft_dataset_filename, keep_in_memory=True)
 
 #add text column
 train_dataset = train_dataset.map(formatter)
