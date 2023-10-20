@@ -55,8 +55,9 @@ def predict(model:PreTrainedModel, tokenizer:LlamaTokenizer, question:str, conte
     model.eval()
     
     prompt = (
-        "Nachfolgend ist eine Frage gestellt mit dem entsprechenden Kontext\n"
-        "Schreibe eine passende Antwort als vollständiger Satz zur Frage und beziehe den Kontext mit hinein\n\n"
+        "Nachfolgend ist eine Frage gestellt mit dem entsprechenden Kontext.\n"
+        "Schreibe eine passende Antwort zur Frage und beziehe den Kontext mit hinein.\n"
+        "Die Antwort soll eine angemessene Länge besitzen.\n\n"
         "### Frage:\n"
         f"{question}\n\n"
         "### Kontext:\n"
@@ -65,7 +66,7 @@ def predict(model:PreTrainedModel, tokenizer:LlamaTokenizer, question:str, conte
     )
 
     inputs = tokenizer(prompt, return_tensors="pt")
-    outputs = model.generate(input_ids=inputs["input_ids"].to("cuda:0"), attention_mask=inputs["attention_mask"], max_new_tokens=200, pad_token_id=tokenizer.pad_token_id, do_sample=True, temperature=1.0)
+    outputs = model.generate(input_ids=inputs["input_ids"].to("cuda:0"), attention_mask=inputs["attention_mask"], max_new_tokens=200, pad_token_id=tokenizer.pad_token_id, do_sample=True, temperature=0.3)
 
     return tokenizer.decode(outputs[:, inputs["input_ids"].shape[1]:][0], skip_special_tokens=True)
 

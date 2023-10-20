@@ -9,16 +9,16 @@ train_llm:
 
   training_config:
     batch_size: 1
-    grad_accumulation_steps: 8
+    grad_accumulation_steps: 16
     optimizer: "paged_adamw_32bit"
-    learning_rate: 0.0001
-    max_steps: 50
+    learning_rate: 0.00001
+    max_steps: 400
     device_map: "auto"
 
   LoraConfig:
     r: 16
     lora_alpha: 16
-    lora_dropout: 0.05
+    lora_dropout: 0.1
     bias: "none"
     task_type: "CAUSAL_LM"
 

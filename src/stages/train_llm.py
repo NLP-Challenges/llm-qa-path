@@ -86,8 +86,9 @@ print(base_model.print_trainable_parameters())
 ## Load dataset
 def formatter(example):
     prompt = (
-        "Nachfolgend ist eine Frage gestellt mit dem entsprechenden Kontext sowie der passenden Antwort"
-        "Schreibe eine passende Antwort zur Frage und beziehe den Kontext mit hinein"
+        "Nachfolgend ist eine Frage gestellt mit dem entsprechenden Kontext sowie der passenden Antwort.\n"
+        "Schreibe eine passende Antwort zur Frage und beziehe den Kontext mit hinein.\n"
+        "Die Antwort soll so kurz wie möglich sein.\n\n"
         "### Frage:\n"
         f"{example['question']}\n\n"
         "### Kontext:\n"

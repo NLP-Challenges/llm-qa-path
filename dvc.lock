@@ -91,8 +91,8 @@ stages:
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: 6716c702f8436d3fff5f10973350ad3d
-      size: 4301
+      md5: 6fb585c270b74ecd661525f6142e5bbe
+      size: 4366
     params:
       params.yaml:
         train_llm:
@@ -104,14 +104,14 @@ stages:
             max_seq_length: 4096
           training_config:
             batch_size: 1
-            grad_accumulation_steps: 8
+            grad_accumulation_steps: 16
             optimizer: paged_adamw_32bit
-            learning_rate: 0.0001
-            max_steps: 50
+            learning_rate: 1e-05
+            max_steps: 400
             device_map: auto
           LoraConfig:
-            r: 16
-            lora_alpha: 16
+            r: 8
+            lora_alpha: 8
             lora_dropout: 0.05
             bias: none
             task_type: CAUSAL_LM
@@ -123,31 +123,32 @@ stages:
     outs:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 27244d639dbb494821b16c339d90bb89.dir
-      size: 35945559
+      md5: 09795a72f5a967d05e6dd9af53c134cd.dir
+      size: 19168085
       nfiles: 8
   load_llm:
     cmd: python src/stages/load_llm.py ./data/models/llama2-qa-fine-tuned "Wann wurde
-      Python erfunden?" "Die Sprache wurde Anfang der 1990er Jahre von Guido van Rossum
-      am Centrum Wiskunde & Informatica in Amsterdam als Nachfolger für die Programmier-Lehrsprache
-      ABC entwickelt und war ursprünglich für das verteilte Betriebssystem Amoeba
-      gedacht. Der Name geht nicht, wie das Logo vermuten lässt, auf die gleichnamige
-      Schlangengattung Python zurück, sondern bezog sich ursprünglich auf die englische
-      Komikergruppe Monty Python. In der Dokumentation finden sich daher auch einige
-      Anspielungen auf Sketche aus dem Flying Circus. Trotzdem etablierte sich die
-      Assoziation zur Schlange, was sich unter anderem in der Programmiersprache Cobra[16]
-      sowie dem Python-Toolkit „Boa“[17] äußert. Die erste Vollversion erschien im
-      Januar 1994 unter der Bezeichnung Python 1.0. Gegenüber früheren Versionen wurden
-      einige Konzepte der funktionalen Programmierung implementiert, die allerdings
-      später wieder aufgegeben wurden.[18] Von 1995 bis 2000 erschienen neue Versionen,
-      die fortlaufend als Python 1.1, 1.2 etc. bezeichnet wurden."
+      Python erfunden? Sei so präzise wie möglich." "Die Sprache wurde Anfang der
+      1990er Jahre von Guido van Rossum am Centrum Wiskunde & Informatica in Amsterdam
+      als Nachfolger für die Programmier-Lehrsprache ABC entwickelt und war ursprünglich
+      für das verteilte Betriebssystem Amoeba gedacht. Der Name geht nicht, wie das
+      Logo vermuten lässt, auf die gleichnamige Schlangengattung Python zurück, sondern
+      bezog sich ursprünglich auf die englische Komikergruppe Monty Python. In der
+      Dokumentation finden sich daher auch einige Anspielungen auf Sketche aus dem
+      Flying Circus. Trotzdem etablierte sich die Assoziation zur Schlange, was sich
+      unter anderem in der Programmiersprache Cobra[16] sowie dem Python-Toolkit „Boa“[17]
+      äußert. Die erste Vollversion erschien im Januar 1994 unter der Bezeichnung
+      Python 1.0. Gegenüber früheren Versionen wurden einige Konzepte der funktionalen
+      Programmierung implementiert, die allerdings später wieder aufgegeben wurden.[18]
+      Von 1995 bis 2000 erschienen neue Versionen, die fortlaufend als Python 1.1,
+      1.2 etc. bezeichnet wurden."
     deps:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 27244d639dbb494821b16c339d90bb89.dir
-      size: 35945559
+      md5: 09795a72f5a967d05e6dd9af53c134cd.dir
+      size: 19168085
       nfiles: 8
     - path: src/stages/load_llm.py
       hash: md5
-      md5: c00fc9d2564db952799526b000b9c632
-      size: 2371
+      md5: ee83ecd2212aeac611396f599aa8005d
+      size: 2413
