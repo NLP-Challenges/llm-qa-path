@@ -57,7 +57,7 @@ stages:
     deps:
     - path: data/processed/chroma
       hash: md5
-      md5: c0396e3ebf9fddda169345451ffa4bc0.dir
+      md5: 0563712d6bdc2a248538c3a05b0482d9.dir
       size: 2400996
       nfiles: 5
     - path: data/processed/embedder.pkl
@@ -66,8 +66,8 @@ stages:
       size: 542838819
     - path: src/stages/load_vectorstore.py
       hash: md5
-      md5: b603002a23c0a776aea65e89dfcbbba1
-      size: 1084
+      md5: d2db77ce166cbb58f50307ee8136b6a3
+      size: 2032
   build_ft_dataset:
     cmd: python src/stages/build_ft_dataset.py data/processed/ft_dataset.hf
     deps:
@@ -86,13 +86,13 @@ stages:
     deps:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: 83264110ffe337db3fa5c022a5496c9f.dir
-      size: 76802370
-      nfiles: 5
+      md5: 094a8d216f97b748083d1e44fa9e4680.dir
+      size: 16029946
+      nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: 4f76c5aa72607dc07e41da971f3fd33f
-      size: 4280
+      md5: 6716c702f8436d3fff5f10973350ad3d
+      size: 4301
     params:
       params.yaml:
         train_llm:
@@ -123,7 +123,7 @@ stages:
     outs:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: a8d93e07147ba465a6f6a7a53803179b.dir
+      md5: 27244d639dbb494821b16c339d90bb89.dir
       size: 35945559
       nfiles: 8
   load_llm:
@@ -144,7 +144,7 @@ stages:
     deps:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: a8d93e07147ba465a6f6a7a53803179b.dir
+      md5: 27244d639dbb494821b16c339d90bb89.dir
       size: 35945559
       nfiles: 8
     - path: src/stages/load_llm.py
