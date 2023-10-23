@@ -1,5 +1,5 @@
 """
-Dieses Script is für das Einteilen von Text in Texblöcke (Corpus) zuständig.
+This script is responsible for dividing text into text blocks (corpus).
 
 Usage: script_name.py text_filename(input) curpus_filename(output)
 """

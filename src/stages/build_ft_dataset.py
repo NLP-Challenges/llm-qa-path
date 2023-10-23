@@ -1,5 +1,6 @@
 """
-Dieses Script ist für das erstellen des llm fine-tuning datasets verantwortlich. Zum jetzigen Zeitpunkt wird das germanquad datenset (https://huggingface.co/datasets/deepset/germanquad) verwendet.
+This script is responsible for creating the llm fine-tuning dataset. The germanquad dataset (https://huggingface.co/datasets/deepset/germanquad) is currently used.
+
 Usage: script_name.py train_dataset_filename(output)
 """
 

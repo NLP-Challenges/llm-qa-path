@@ -1,6 +1,6 @@
 """
-Dieses Script is für das erstellen einer Chroma Vektordatenbank verantwortlich.
-Auf dieser Datenbank kann eine Similarity-Query durchgeführt werden.
+This script is responsible for creating a Chroma vector database.
+A similarity query can be carried out on this database.
 
 Usage: script_name.py corpus_filename(input) embedder_filename(input) vector_database_filename(output)
 """

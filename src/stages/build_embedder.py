@@ -1,5 +1,5 @@
 """
-Dieses Script generiert ein Embedder, welcher für das generieren von Embeddings verwendet werden kann.
+This script generates an embedder that can be used to generate embeddings.
 
 Usage: script_name.py model_name(input) embedder_filename(output)
 """

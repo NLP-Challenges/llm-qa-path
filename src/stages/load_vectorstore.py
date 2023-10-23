@@ -1,6 +1,6 @@
 """
-Dieses Script is für das Laden einer Chroma Vektordatenbank verantwortlich.
-Auf dieser Datenbank kann eine Similarity-Query durchgeführt werden.
+This script is responsible for loading a Chroma vector database.
+A similarity query can be carried out on this database.
 
 Usage: script_name.py vector_database_filename(input) embedder_filename(input) query(input)
 """

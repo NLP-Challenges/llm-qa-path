@@ -9,8 +9,8 @@ stages:
       size: 7161
     - path: src/stages/build_corpus.py
       hash: md5
-      md5: 76f8ce2f4997acf627532affdc6369d5
-      size: 918
+      md5: 3b203436718e74c61848b90e16606eb9
+      size: 910
     outs:
     - path: data/processed/corpus.pkl
       hash: md5
@@ -22,12 +22,12 @@ stages:
     deps:
     - path: src/stages/build_embedder.py
       hash: md5
-      md5: 5f190a62a322f0413d8dfa7555898b85
-      size: 762
+      md5: 8bdeab160c9b0d681db86bcb4b75670e
+      size: 733
     outs:
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: c1ff39d790a2ae28be9b0c976a0aa5d0
+      md5: 3c548e18ba48e7b7adc532ffda7988d1
       size: 542838819
   build_vectorstore:
     cmd: python src/stages/build_vectorstore.py data/processed/corpus.pkl data/processed/embedder.pkl
@@ -39,16 +39,16 @@ stages:
       size: 7363
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: c1ff39d790a2ae28be9b0c976a0aa5d0
+      md5: 3c548e18ba48e7b7adc532ffda7988d1
       size: 542838819
     - path: src/stages/build_vectorstore.py
       hash: md5
-      md5: e4282f990112524267e168ce701b76de
-      size: 1188
+      md5: dd5de97d567f420272e32d6be5b3b118
+      size: 1159
     outs:
     - path: data/processed/chroma
       hash: md5
-      md5: 0563712d6bdc2a248538c3a05b0482d9.dir
+      md5: 71925c72783e79e79aa8b1561f06dfa5.dir
       size: 2400996
       nfiles: 5
   load_vectorstore:
@@ -57,24 +57,24 @@ stages:
     deps:
     - path: data/processed/chroma
       hash: md5
-      md5: 0563712d6bdc2a248538c3a05b0482d9.dir
+      md5: 71925c72783e79e79aa8b1561f06dfa5.dir
       size: 2400996
       nfiles: 5
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: c1ff39d790a2ae28be9b0c976a0aa5d0
+      md5: 3c548e18ba48e7b7adc532ffda7988d1
       size: 542838819
     - path: src/stages/load_vectorstore.py
       hash: md5
-      md5: d2db77ce166cbb58f50307ee8136b6a3
-      size: 2032
+      md5: 9aee0b369d1a0dc2cf96a105a9f11be9
+      size: 2006
   build_ft_dataset:
     cmd: python src/stages/build_ft_dataset.py data/processed/ft_dataset.hf
     deps:
     - path: src/stages/build_ft_dataset.py
       hash: md5
-      md5: e39f0ee592bc35412be4f71da5886f06
-      size: 1568
+      md5: 4a3f12573c07722d11cdc733b38cf718
+      size: 1536
     outs:
     - path: data/processed/ft_dataset.hf
       hash: md5
@@ -91,8 +91,8 @@ stages:
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: 6fb585c270b74ecd661525f6142e5bbe
-      size: 4366
+      md5: 99aeec8f556ac6de3b2b5c46d8fae825
+      size: 4368
     params:
       params.yaml:
         train_llm:
@@ -104,15 +104,15 @@ stages:
             max_seq_length: 4096
           training_config:
             batch_size: 1
-            grad_accumulation_steps: 16
+            grad_accumulation_steps: 8
             optimizer: paged_adamw_32bit
-            learning_rate: 1e-05
-            max_steps: 400
+            learning_rate: 0.0001
+            max_steps: 50
             device_map: auto
           LoraConfig:
-            r: 8
-            lora_alpha: 8
-            lora_dropout: 0.05
+            r: 16
+            lora_alpha: 16
+            lora_dropout: 0.1
             bias: none
             task_type: CAUSAL_LM
           BitsAndBytesConfig:
@@ -123,32 +123,44 @@ stages:
     outs:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 09795a72f5a967d05e6dd9af53c134cd.dir
-      size: 19168085
+      md5: 17905153aac24998a45890ee9db3e225.dir
+      size: 35945558
       nfiles: 8
   load_llm:
-    cmd: python src/stages/load_llm.py ./data/models/llama2-qa-fine-tuned "Wann wurde
-      Python erfunden? Sei so präzise wie möglich." "Die Sprache wurde Anfang der
-      1990er Jahre von Guido van Rossum am Centrum Wiskunde & Informatica in Amsterdam
-      als Nachfolger für die Programmier-Lehrsprache ABC entwickelt und war ursprünglich
-      für das verteilte Betriebssystem Amoeba gedacht. Der Name geht nicht, wie das
-      Logo vermuten lässt, auf die gleichnamige Schlangengattung Python zurück, sondern
-      bezog sich ursprünglich auf die englische Komikergruppe Monty Python. In der
-      Dokumentation finden sich daher auch einige Anspielungen auf Sketche aus dem
-      Flying Circus. Trotzdem etablierte sich die Assoziation zur Schlange, was sich
-      unter anderem in der Programmiersprache Cobra[16] sowie dem Python-Toolkit „Boa“[17]
-      äußert. Die erste Vollversion erschien im Januar 1994 unter der Bezeichnung
-      Python 1.0. Gegenüber früheren Versionen wurden einige Konzepte der funktionalen
-      Programmierung implementiert, die allerdings später wieder aufgegeben wurden.[18]
-      Von 1995 bis 2000 erschienen neue Versionen, die fortlaufend als Python 1.1,
-      1.2 etc. bezeichnet wurden."
+    cmd: python src/stages/load_llm.py load_llm ./data/models/llama2-qa-fine-tuned
+      "Wann wurde Python erfunden?" "Die Sprache wurde Anfang der 1990er Jahre von
+      Guido van Rossum am Centrum Wiskunde & Informatica in Amsterdam als Nachfolger
+      für die Programmier-Lehrsprache ABC entwickelt und war ursprünglich für das
+      verteilte Betriebssystem Amoeba gedacht. Der Name geht nicht, wie das Logo vermuten
+      lässt, auf die gleichnamige Schlangengattung Python zurück, sondern bezog sich
+      ursprünglich auf die englische Komikergruppe Monty Python. In der Dokumentation
+      finden sich daher auch einige Anspielungen auf Sketche aus dem Flying Circus.
+      Trotzdem etablierte sich die Assoziation zur Schlange, was sich unter anderem
+      in der Programmiersprache Cobra[16] sowie dem Python-Toolkit „Boa“[17] äußert.
+      Die erste Vollversion erschien im Januar 1994 unter der Bezeichnung Python 1.0.
+      Gegenüber früheren Versionen wurden einige Konzepte der funktionalen Programmierung
+      implementiert, die allerdings später wieder aufgegeben wurden.[18] Von 1995
+      bis 2000 erschienen neue Versionen, die fortlaufend als Python 1.1, 1.2 etc.
+      bezeichnet wurden."
     deps:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 09795a72f5a967d05e6dd9af53c134cd.dir
-      size: 19168085
+      md5: 17905153aac24998a45890ee9db3e225.dir
+      size: 35945558
       nfiles: 8
     - path: src/stages/load_llm.py
       hash: md5
-      md5: ee83ecd2212aeac611396f599aa8005d
-      size: 2413
+      md5: 02cbeca4417a2f4245dce35bc10132e0
+      size: 2761
+    params:
+      params.yaml:
+        load_llm:
+          BitsAndBytesConfig:
+            load_in_4bit: true
+            bnb_4bit_use_double_quant: true
+            bnb_4bit_quant_type: nf4
+            bnb_4bit_compute_dtype: torch.bfloat16
+          model_params:
+            device_map: auto
+            temperature: 0.3
+            max_new_tokens: 200
