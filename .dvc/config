@@ -1,0 +1,6 @@
+[core]
+    autostage = true
+    remote = chatbot-qa
+['remote "chatbot-qa"']
+    url = gdrive://1CwwO-yXbYWdBRa_bGjrp1aiXjGmV_epz/question-answer
+    gdrive_acknowledge_abuse = true

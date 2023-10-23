@@ -1,0 +1,166 @@
+schema: '2.0'
+stages:
+  build_corpus:
+    cmd: python src/stages/build_corpus.py data/raw/example_context.txt data/processed/corpus.pkl
+    deps:
+    - path: data/raw/example_context.txt
+      hash: md5
+      md5: 6f1ec549bb9074a2fe151ca623eca5c8
+      size: 7161
+    - path: src/stages/build_corpus.py
+      hash: md5
+      md5: 3b203436718e74c61848b90e16606eb9
+      size: 910
+    outs:
+    - path: data/processed/corpus.pkl
+      hash: md5
+      md5: c5bff24c94fd2a5433666630fa7bc3f2
+      size: 7363
+  build_embedder:
+    cmd: python src/stages/build_embedder.py "sentence-transformers/distiluse-base-multilingual-cased-v1"
+      data/processed/embedder.pkl
+    deps:
+    - path: src/stages/build_embedder.py
+      hash: md5
+      md5: 8bdeab160c9b0d681db86bcb4b75670e
+      size: 733
+    outs:
+    - path: data/processed/embedder.pkl
+      hash: md5
+      md5: 3c548e18ba48e7b7adc532ffda7988d1
+      size: 542838819
+  build_vectorstore:
+    cmd: python src/stages/build_vectorstore.py data/processed/corpus.pkl data/processed/embedder.pkl
+      data/processed/chroma
+    deps:
+    - path: data/processed/corpus.pkl
+      hash: md5
+      md5: c5bff24c94fd2a5433666630fa7bc3f2
+      size: 7363
+    - path: data/processed/embedder.pkl
+      hash: md5
+      md5: 3c548e18ba48e7b7adc532ffda7988d1
+      size: 542838819
+    - path: src/stages/build_vectorstore.py
+      hash: md5
+      md5: dd5de97d567f420272e32d6be5b3b118
+      size: 1159
+    outs:
+    - path: data/processed/chroma
+      hash: md5
+      md5: 71925c72783e79e79aa8b1561f06dfa5.dir
+      size: 2400996
+      nfiles: 5
+  load_vectorstore:
+    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl
+      "Wo braucht es einen agenten?"
+    deps:
+    - path: data/processed/chroma
+      hash: md5
+      md5: 71925c72783e79e79aa8b1561f06dfa5.dir
+      size: 2400996
+      nfiles: 5
+    - path: data/processed/embedder.pkl
+      hash: md5
+      md5: 3c548e18ba48e7b7adc532ffda7988d1
+      size: 542838819
+    - path: src/stages/load_vectorstore.py
+      hash: md5
+      md5: 9aee0b369d1a0dc2cf96a105a9f11be9
+      size: 2006
+  build_ft_dataset:
+    cmd: python src/stages/build_ft_dataset.py data/processed/ft_dataset.hf
+    deps:
+    - path: src/stages/build_ft_dataset.py
+      hash: md5
+      md5: 4a3f12573c07722d11cdc733b38cf718
+      size: 1536
+    outs:
+    - path: data/processed/ft_dataset.hf
+      hash: md5
+      md5: 094a8d216f97b748083d1e44fa9e4680.dir
+      size: 16029946
+      nfiles: 3
+  train_llm:
+    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset.hf ./data/models/llama2-qa-fine-tuned
+    deps:
+    - path: data/processed/ft_dataset.hf
+      hash: md5
+      md5: 094a8d216f97b748083d1e44fa9e4680.dir
+      size: 16029946
+      nfiles: 3
+    - path: src/stages/train_llm.py
+      hash: md5
+      md5: 99aeec8f556ac6de3b2b5c46d8fae825
+      size: 4368
+    params:
+      params.yaml:
+        train_llm:
+          wandb_params:
+            entity: t_buess
+            project: chatbot-qa
+          model_params:
+            base_model_id: meta-llama/Llama-2-7b-hf
+            max_seq_length: 4096
+          training_config:
+            batch_size: 1
+            grad_accumulation_steps: 8
+            optimizer: paged_adamw_32bit
+            learning_rate: 0.0001
+            max_steps: 50
+            device_map: auto
+          LoraConfig:
+            r: 16
+            lora_alpha: 16
+            lora_dropout: 0.1
+            bias: none
+            task_type: CAUSAL_LM
+          BitsAndBytesConfig:
+            load_in_4bit: true
+            bnb_4bit_use_double_quant: true
+            bnb_4bit_quant_type: nf4
+            bnb_4bit_compute_dtype: torch.bfloat16
+    outs:
+    - path: ./data/models/llama2-qa-fine-tuned
+      hash: md5
+      md5: 17905153aac24998a45890ee9db3e225.dir
+      size: 35945558
+      nfiles: 8
+  load_llm:
+    cmd: python src/stages/load_llm.py load_llm ./data/models/llama2-qa-fine-tuned
+      "Wann wurde Python erfunden?" "Die Sprache wurde Anfang der 1990er Jahre von
+      Guido van Rossum am Centrum Wiskunde & Informatica in Amsterdam als Nachfolger
+      für die Programmier-Lehrsprache ABC entwickelt und war ursprünglich für das
+      verteilte Betriebssystem Amoeba gedacht. Der Name geht nicht, wie das Logo vermuten
+      lässt, auf die gleichnamige Schlangengattung Python zurück, sondern bezog sich
+      ursprünglich auf die englische Komikergruppe Monty Python. In der Dokumentation
+      finden sich daher auch einige Anspielungen auf Sketche aus dem Flying Circus.
+      Trotzdem etablierte sich die Assoziation zur Schlange, was sich unter anderem
+      in der Programmiersprache Cobra[16] sowie dem Python-Toolkit „Boa“[17] äußert.
+      Die erste Vollversion erschien im Januar 1994 unter der Bezeichnung Python 1.0.
+      Gegenüber früheren Versionen wurden einige Konzepte der funktionalen Programmierung
+      implementiert, die allerdings später wieder aufgegeben wurden.[18] Von 1995
+      bis 2000 erschienen neue Versionen, die fortlaufend als Python 1.1, 1.2 etc.
+      bezeichnet wurden."
+    deps:
+    - path: ./data/models/llama2-qa-fine-tuned
+      hash: md5
+      md5: 17905153aac24998a45890ee9db3e225.dir
+      size: 35945558
+      nfiles: 8
+    - path: src/stages/load_llm.py
+      hash: md5
+      md5: 02cbeca4417a2f4245dce35bc10132e0
+      size: 2761
+    params:
+      params.yaml:
+        load_llm:
+          BitsAndBytesConfig:
+            load_in_4bit: true
+            bnb_4bit_use_double_quant: true
+            bnb_4bit_quant_type: nf4
+            bnb_4bit_compute_dtype: torch.bfloat16
+          model_params:
+            device_map: auto
+            temperature: 0.3
+            max_new_tokens: 200

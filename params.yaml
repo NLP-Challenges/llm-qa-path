@@ -1,0 +1,41 @@
+train_llm:
+  wandb_params:
+    entity: "t_buess"
+    project: "chatbot-qa"
+
+  model_params:
+    base_model_id: "meta-llama/Llama-2-7b-hf"
+    max_seq_length: 4096
+
+  training_config:
+    batch_size: 1
+    grad_accumulation_steps: 8
+    optimizer: "paged_adamw_32bit"
+    learning_rate: 0.0001
+    max_steps: 50
+    device_map: "auto"
+
+  LoraConfig:
+    r: 16
+    lora_alpha: 16
+    lora_dropout: 0.1
+    bias: "none"
+    task_type: "CAUSAL_LM"
+
+  BitsAndBytesConfig:
+    load_in_4bit: True
+    bnb_4bit_use_double_quant: True
+    bnb_4bit_quant_type: "nf4"
+    bnb_4bit_compute_dtype: torch.bfloat16
+
+load_llm:
+  BitsAndBytesConfig:
+    load_in_4bit: True
+    bnb_4bit_use_double_quant: True
+    bnb_4bit_quant_type: "nf4"
+    bnb_4bit_compute_dtype: torch.bfloat16
+
+  model_params:
+    device_map: "auto"
+    temperature: 0.3
+    max_new_tokens: 200
