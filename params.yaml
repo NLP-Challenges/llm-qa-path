@@ -12,7 +12,7 @@ train_llm:
     grad_accumulation_steps: 8
     optimizer: "paged_adamw_32bit"
     learning_rate: 0.0001
-    max_steps: 50
+    max_steps: 200
     device_map: "auto"
 
   LoraConfig:
