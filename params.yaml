@@ -43,5 +43,7 @@ load_llm:
 
   model_params:
     device_map: "auto"
-    temperature: 0.3
     max_new_tokens: 200
+    top_k: 4
+    penalty_alpha: 0.6
+    temperature: 0.4
