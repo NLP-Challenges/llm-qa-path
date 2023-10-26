@@ -1,3 +1,8 @@
+build_tf_dataset:
+  seed: 1234
+  frac_original: 0.7
+  frag_swapped: 0.3
+
 train_llm:
   wandb_params:
     entity: "t_buess"

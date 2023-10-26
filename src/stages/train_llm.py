@@ -21,6 +21,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('params_parent_field')
 parser.add_argument('train_dataset_filename')
 parser.add_argument('ft_output_path')
+
 args = parser.parse_args()
 
 # Access the arguments

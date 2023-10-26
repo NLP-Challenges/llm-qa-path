@@ -69,30 +69,30 @@ stages:
       md5: 9aee0b369d1a0dc2cf96a105a9f11be9
       size: 2006
   build_ft_dataset:
-    cmd: python src/stages/build_ft_dataset.py 1234 data/processed/ft_dataset.hf
+    cmd: python src/stages/build_ft_dataset.py build_tf_dataset data/processed/ft_dataset.hf
     deps:
     - path: src/stages/build_ft_dataset.py
       hash: md5
-      md5: 120b8dc6c0342c29a71837bfc2da68b3
-      size: 2880
+      md5: 32625a229da82d4e7703b3f647ca0590
+      size: 3495
     outs:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: cb8b3f0e84482051675bc4dd8506ff3d.dir
-      size: 15606663
+      md5: b58660be182cc9f3064d313e1a10a41d.dir
+      size: 15612559
       nfiles: 3
   train_llm:
     cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset.hf ./data/models/llama2-qa-fine-tuned
     deps:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: cb8b3f0e84482051675bc4dd8506ff3d.dir
-      size: 15606663
+      md5: b58660be182cc9f3064d313e1a10a41d.dir
+      size: 15612559
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: 99aeec8f556ac6de3b2b5c46d8fae825
-      size: 4368
+      md5: 6fdb6d89f2e654d0c50b54189a4244ba
+      size: 4370
     params:
       params.yaml:
         train_llm:
@@ -123,28 +123,29 @@ stages:
     outs:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 86d7af82406efc2c4efa0e751d7ae304.dir
+      md5: 4a24e79fe9f1cf4666cbe6bc95bbffe8.dir
       size: 35945558
       nfiles: 8
   load_llm:
     cmd: python src/stages/load_llm.py load_llm ./data/models/llama2-qa-fine-tuned
-      "Wer hat Python erfunden?" "Die Sprache wurde Anfang der 1990er Jahre von Guido
-      van Rossum am Centrum Wiskunde & Informatica in Amsterdam als Nachfolger für
-      die Programmier-Lehrsprache ABC entwickelt und war ursprünglich für das verteilte
-      Betriebssystem Amoeba gedacht. Der Name geht nicht, wie das Logo vermuten lässt,
-      auf die gleichnamige Schlangengattung Python zurück, sondern bezog sich ursprünglich
-      auf die englische Komikergruppe Monty Python. In der Dokumentation finden sich
-      daher auch einige Anspielungen auf Sketche aus dem Flying Circus. Trotzdem etablierte
-      sich die Assoziation zur Schlange, was sich unter anderem in der Programmiersprache
-      Cobra[16] sowie dem Python-Toolkit „Boa“[17] äußert. Die erste Vollversion erschien
-      im Januar 1994 unter der Bezeichnung Python 1.0. Gegenüber früheren Versionen
-      wurden einige Konzepte der funktionalen Programmierung implementiert, die allerdings
-      später wieder aufgegeben wurden.[18] Von 1995 bis 2000 erschienen neue Versionen,
-      die fortlaufend als Python 1.1, 1.2 etc. bezeichnet wurden."
+      "Wie wird das Wetter morgen?" "Die Sprache wurde Anfang der 1990er Jahre von
+      Guido van Rossum am Centrum Wiskunde & Informatica in Amsterdam als Nachfolger
+      für die Programmier-Lehrsprache ABC entwickelt und war ursprünglich für das
+      verteilte Betriebssystem Amoeba gedacht. Der Name geht nicht, wie das Logo vermuten
+      lässt, auf die gleichnamige Schlangengattung Python zurück, sondern bezog sich
+      ursprünglich auf die englische Komikergruppe Monty Python. In der Dokumentation
+      finden sich daher auch einige Anspielungen auf Sketche aus dem Flying Circus.
+      Trotzdem etablierte sich die Assoziation zur Schlange, was sich unter anderem
+      in der Programmiersprache Cobra[16] sowie dem Python-Toolkit „Boa“[17] äußert.
+      Die erste Vollversion erschien im Januar 1994 unter der Bezeichnung Python 1.0.
+      Gegenüber früheren Versionen wurden einige Konzepte der funktionalen Programmierung
+      implementiert, die allerdings später wieder aufgegeben wurden.[18] Von 1995
+      bis 2000 erschienen neue Versionen, die fortlaufend als Python 1.1, 1.2 etc.
+      bezeichnet wurden."
     deps:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 86d7af82406efc2c4efa0e751d7ae304.dir
+      md5: 4a24e79fe9f1cf4666cbe6bc95bbffe8.dir
       size: 35945558
       nfiles: 8
     - path: src/stages/load_llm.py
