@@ -5,11 +5,11 @@ build_tf_dataset:
 
 train_llm:
   wandb_params:
-    entity: "t_buess"
-    project: "chatbot-qa"
+    entity: "yvokeller"
+    project: "llm-qa-path"
 
   model_params:
-    base_model_id: "meta-llama/Llama-2-13b-hf"
+    base_model_id: "meta-llama/Llama-2-13b-hf" # mistralai/Mistral-7B-v0.1
     max_seq_length: 4096
 
   training_config:
