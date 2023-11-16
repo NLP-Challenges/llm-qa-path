@@ -69,30 +69,36 @@ stages:
       md5: 9aee0b369d1a0dc2cf96a105a9f11be9
       size: 2006
   build_ft_dataset:
-    cmd: python src/stages/build_ft_dataset.py data/processed/ft_dataset.hf
+    cmd: python src/stages/build_ft_dataset.py build_tf_dataset data/processed/ft_dataset.hf
     deps:
     - path: src/stages/build_ft_dataset.py
       hash: md5
-      md5: 4a3f12573c07722d11cdc733b38cf718
-      size: 1536
+      md5: 32625a229da82d4e7703b3f647ca0590
+      size: 3495
+    params:
+      params.yaml:
+        build_tf_dataset:
+          seed: 1234
+          frac_original: 0.9
+          frag_swapped: 0.1
     outs:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: 094a8d216f97b748083d1e44fa9e4680.dir
-      size: 16029946
+      md5: a7b0b1c48b9b4498b0b30345ab7a6102.dir
+      size: 15995175
       nfiles: 3
   train_llm:
     cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset.hf ./data/models/llama2-qa-fine-tuned
     deps:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: 094a8d216f97b748083d1e44fa9e4680.dir
-      size: 16029946
+      md5: a7b0b1c48b9b4498b0b30345ab7a6102.dir
+      size: 15995175
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: 99aeec8f556ac6de3b2b5c46d8fae825
-      size: 4368
+      md5: ebeb6b929f8d89b2cfc23fafe438fecd
+      size: 4684
     params:
       params.yaml:
         train_llm:
@@ -100,18 +106,19 @@ stages:
             entity: t_buess
             project: chatbot-qa
           model_params:
-            base_model_id: meta-llama/Llama-2-7b-hf
+            base_model_id: meta-llama/Llama-2-13b-hf
             max_seq_length: 4096
           training_config:
             batch_size: 1
             grad_accumulation_steps: 8
             optimizer: paged_adamw_32bit
             learning_rate: 0.0001
-            max_steps: 50
+            max_steps: 100
             device_map: auto
+            completion_only: true
           LoraConfig:
-            r: 16
-            lora_alpha: 16
+            r: 6
+            lora_alpha: 10
             lora_dropout: 0.1
             bias: none
             task_type: CAUSAL_LM
@@ -123,12 +130,12 @@ stages:
     outs:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 17905153aac24998a45890ee9db3e225.dir
-      size: 35945558
+      md5: e409354cb726aceff4b594d8673b41b8.dir
+      size: 22063254
       nfiles: 8
   load_llm:
     cmd: python src/stages/load_llm.py load_llm ./data/models/llama2-qa-fine-tuned
-      "Wann wurde Python erfunden?" "Die Sprache wurde Anfang der 1990er Jahre von
+      "Auf was spielte Python an?" "Die Sprache wurde Anfang der 1990er Jahre von
       Guido van Rossum am Centrum Wiskunde & Informatica in Amsterdam als Nachfolger
       für die Programmier-Lehrsprache ABC entwickelt und war ursprünglich für das
       verteilte Betriebssystem Amoeba gedacht. Der Name geht nicht, wie das Logo vermuten
@@ -145,13 +152,13 @@ stages:
     deps:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 17905153aac24998a45890ee9db3e225.dir
-      size: 35945558
+      md5: e409354cb726aceff4b594d8673b41b8.dir
+      size: 22063254
       nfiles: 8
     - path: src/stages/load_llm.py
       hash: md5
-      md5: 02cbeca4417a2f4245dce35bc10132e0
-      size: 2761
+      md5: aef23d6f0180abae2c64510c90dc672a
+      size: 2902
     params:
       params.yaml:
         load_llm:
@@ -162,5 +169,7 @@ stages:
             bnb_4bit_compute_dtype: torch.bfloat16
           model_params:
             device_map: auto
-            temperature: 0.3
             max_new_tokens: 200
+            top_k: 4
+            penalty_alpha: 0.6
+            temperature: 0.4

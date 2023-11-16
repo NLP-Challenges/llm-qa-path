@@ -12,7 +12,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments,
 import torch
 from peft import LoraConfig, prepare_model_for_kbit_training, get_peft_model, AutoPeftModelForCausalLM
 from datasets import load_from_disk
-from trl import SFTTrainer
+from trl import SFTTrainer, DataCollatorForCompletionOnlyLM
 import yaml
 
 parser = argparse.ArgumentParser()
@@ -21,6 +21,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('params_parent_field')
 parser.add_argument('train_dataset_filename')
 parser.add_argument('ft_output_path')
+
 args = parser.parse_args()
 
 # Access the arguments
@@ -52,6 +53,7 @@ learning_rate = params["training_config"]["learning_rate"]
 max_steps = params["training_config"]["max_steps"]
 max_seq_length = params["model_params"]["max_seq_length"]
 device_map = params["training_config"]["device_map"]
+train_on_completion_only = params["training_config"]["completion_only"]
 
 ## Configuration
 lora_config = LoraConfig(
@@ -81,7 +83,7 @@ base_model.config.pretraining_tp = 1
 
 base_model:AutoPeftModelForCausalLM = prepare_model_for_kbit_training(base_model)
 base_model = get_peft_model(base_model, lora_config) # add lora adapters
-print(base_model.print_trainable_parameters())
+base_model.print_trainable_parameters()
 
 ## Load dataset
 def formatter(example):
@@ -124,7 +126,8 @@ fine_tuning = SFTTrainer(
     train_dataset=train_dataset,
     dataset_text_field=train_set_text_field,
     max_seq_length=max_seq_length,
-    args=train_args
+    args=train_args,
+    data_collator = DataCollatorForCompletionOnlyLM("Antwort:\n", tokenizer=tokenizer) if train_on_completion_only else None #train on completion only (text after "Antwort:\n") if train_on_completion_only == True
 )
 
 fine_tuning.train()
