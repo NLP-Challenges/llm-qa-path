@@ -85,20 +85,15 @@ elif strategy == 'selfquery':
     # Define our metadata
     metadata_field_info = [
         AttributeInfo(
-            name="module_name",
+            name="Modul",
             description="Name des Modul/Kurs/Space, auf den sich das Dokument bezieht",
             type="string",
         ),
         AttributeInfo(
-            name="module_abbreviation",
-            description="Kurzbezeichnung des Modul/Kurs/Space, um das es in dem Dokument geht",
+            name="Modulkuerzel",
+            description="3 bis 4-stellige Kurzbezeichnung des Modul/Kurs/Space, um das es in dem Dokument geht",
             type="string",
-        ),
-        AttributeInfo(
-            name="source",
-            description="Tab innerhalb des Moduls/Kurses/Space, aus dem das Dokument stammt",
-            type="string",
-        ),
+        )
     ]
     document_content_description = "Informationen aus Spaces, der Lernplattform des Studiengang Bachelor of Data Science an der FHNW"
 

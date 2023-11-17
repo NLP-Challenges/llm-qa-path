@@ -24,7 +24,7 @@ stages:
       - data/processed/chroma
 
   load_vectorstore:
-    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl "Wo braucht es einen agenten?"
+    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl "Was weisst du zum  Modul Vertiefende Themen der Analysis?" --strategy selfquery
     deps:
       - src/stages/load_vectorstore.py
       - data/processed/chroma

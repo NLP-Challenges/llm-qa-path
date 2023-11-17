@@ -50,12 +50,11 @@ for filename in tqdm(os.listdir(data_folder_name), 'Building Corpus'):
         # Create a document for each row in the dataframe
         for index, space in df_spaces.iterrows():
             metadata = {
-                'space_nature': space['nature'] if space['nature'] else 'unknown',
-                'module_name': space['name'] if space['name'] else 'unknown',
-                'module_abbreviation': space['abbreviation'] if space['abbreviation'] else 'unknown',
-                'ects': space['ects'] if space['ects'] else 'unknown',
-                'semester': space['semester'] if space['semester'] else 'unknown',
-                'tags': ', '.join(space['tag_values'].tolist()) if len(space['tag_values']) > 0 else 'none',
+                'Modul': space['name'] if space['name'] else 'unknown',
+                'Modulkuerzel': space['abbreviation'] if space['abbreviation'] else 'unknown',
+                'ECTS': space['ects'] if space['ects'] else 'unknown',
+                'Semester': space['semester'] if space['semester'] else 'unknown',
+                'Tags': ', '.join(space['tag_values'].tolist()) if len(space['tag_values']) > 0 else 'none',
             }
 
             headers_to_split_on = [
@@ -67,16 +66,19 @@ for filename in tqdm(os.listdir(data_folder_name), 'Building Corpus'):
             html_splitter = HTMLHeaderTextSplitter(headers_to_split_on=headers_to_split_on)
             if space['portrait_content']:
                 portrait_splits = html_splitter.split_text(space['portrait_content'])
-                # add metadata to each portrait split
                 for portrait_tab in portrait_splits:
-                    portrait_tab.metadata = dict(**{ 'source': 'module_portrait' }, **portrait_tab.metadata, **metadata)
+                    portrait_tab.metadata = dict(**{ 'Quelle': f'Portrait des {space["name"]} Space' }, **portrait_tab.metadata, **metadata)
                 docs.extend(portrait_splits)
             if space['exercise_content']:
-                exercise_tab = Document(page_content=space['exercise_content'], metadata=dict({ 'source': 'module_exercises' }, **metadata))
-                docs.append(exercise_tab)
+                exercise_splits = html_splitter.split_text(space['exercise_content'])
+                for exercise_tab in exercise_splits:
+                    exercise_tab.metadata = dict(**{ 'Quelle': f'Aufgaben im {space["name"]} Space' }, **exercise_tab.metadata, **metadata)
+                docs.extend(exercise_splits)
             if space['sidebar_content']:
-                sidebar_content = Document(page_content=space['sidebar_content'], metadata=dict({ 'source': 'module_sidebar' }, **metadata))
-                docs.append(sidebar_content)
+                sidebar_splits = html_splitter.split_text(space['sidebar_content'])
+                for sidebar_tab in sidebar_splits:
+                    sidebar_tab.metadata = dict(**{ 'Quelle': f'Sidebar des {space["name"]} Space' }, **sidebar_tab.metadata, **metadata)
+                docs.extend(sidebar_splits)
 
 # save docs to jsonlines file
 docs = chromautils.filter_complex_metadata(docs)
@@ -84,5 +86,3 @@ save_docs_to_jsonl(docs, corpus_filename, mode='w')
 
 # wait a sec to avoid simulateous access to files
 time.sleep(1)
-
-
