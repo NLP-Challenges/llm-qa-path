@@ -1,56 +1,57 @@
 schema: '2.0'
 stages:
   build_corpus:
-    cmd: python src/stages/build_corpus.py data/raw/example_context.txt data/processed/corpus.pkl
+    cmd: python src/stages/build_corpus.py data/raw/spaces data/processed/corpus.jsonl
     deps:
-    - path: data/raw/example_context.txt
+    - path: data/raw/spaces
       hash: md5
-      md5: 6f1ec549bb9074a2fe151ca623eca5c8
-      size: 7161
+      md5: 951bdfeeccb1829be3f0c47c85acc486.dir
+      size: 2296980
+      nfiles: 5
     - path: src/stages/build_corpus.py
       hash: md5
-      md5: 3b203436718e74c61848b90e16606eb9
-      size: 910
+      md5: c9cee9c57fc6b8b2440f18f4cc808313
+      size: 3434
     outs:
-    - path: data/processed/corpus.pkl
+    - path: data/processed/corpus.jsonl
       hash: md5
-      md5: c5bff24c94fd2a5433666630fa7bc3f2
-      size: 7363
+      md5: 9b2f4205ec36833862b685a610494de3
+      size: 2420949
   build_embedder:
     cmd: python src/stages/build_embedder.py "sentence-transformers/distiluse-base-multilingual-cased-v1"
       data/processed/embedder.pkl
     deps:
     - path: src/stages/build_embedder.py
       hash: md5
-      md5: 8bdeab160c9b0d681db86bcb4b75670e
-      size: 733
+      md5: 59ce8507a491acdaea11c4f8adf3da88
+      size: 703
     outs:
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: 3c548e18ba48e7b7adc532ffda7988d1
-      size: 542838819
+      md5: c7bdb2ccbe7fd180f34d6f1da4cc1c23
+      size: 542780257
   build_vectorstore:
-    cmd: python src/stages/build_vectorstore.py data/processed/corpus.pkl data/processed/embedder.pkl
+    cmd: python src/stages/build_vectorstore.py data/processed/corpus.jsonl data/processed/embedder.pkl
       data/processed/chroma
     deps:
-    - path: data/processed/corpus.pkl
+    - path: data/processed/corpus.jsonl
       hash: md5
-      md5: c5bff24c94fd2a5433666630fa7bc3f2
-      size: 7363
+      md5: 9b2f4205ec36833862b685a610494de3
+      size: 2420949
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: 3c548e18ba48e7b7adc532ffda7988d1
-      size: 542838819
+      md5: c7bdb2ccbe7fd180f34d6f1da4cc1c23
+      size: 542780257
     - path: src/stages/build_vectorstore.py
       hash: md5
-      md5: dd5de97d567f420272e32d6be5b3b118
-      size: 1159
+      md5: a07fbcb839e38027871b96e11d4e6e19
+      size: 1541
     outs:
     - path: data/processed/chroma
       hash: md5
-      md5: 71925c72783e79e79aa8b1561f06dfa5.dir
-      size: 2400996
-      nfiles: 5
+      md5: 5e7f4e46c036ed3d0ec82097b74d6dcc.dir
+      size: 21134686
+      nfiles: 6
   load_vectorstore:
     cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl
       "Wo braucht es einen agenten?"
