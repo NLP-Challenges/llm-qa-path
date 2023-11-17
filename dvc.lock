@@ -9,47 +9,47 @@ stages:
       size: 7161
     - path: src/stages/build_corpus.py
       hash: md5
-      md5: 25e262ef077c4aa9541a40e87952ede6
-      size: 867
+      md5: 3b203436718e74c61848b90e16606eb9
+      size: 910
     outs:
     - path: data/processed/corpus.pkl
       hash: md5
-      md5: 9d4d8f41cb30eefa3345adb0d64b48d3
-      size: 7117
+      md5: c5bff24c94fd2a5433666630fa7bc3f2
+      size: 7363
   build_embedder:
     cmd: python src/stages/build_embedder.py "sentence-transformers/distiluse-base-multilingual-cased-v1"
       data/processed/embedder.pkl
     deps:
     - path: src/stages/build_embedder.py
       hash: md5
-      md5: 59ce8507a491acdaea11c4f8adf3da88
-      size: 703
+      md5: 8bdeab160c9b0d681db86bcb4b75670e
+      size: 733
     outs:
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: c7bdb2ccbe7fd180f34d6f1da4cc1c23
-      size: 542780257
+      md5: 3c548e18ba48e7b7adc532ffda7988d1
+      size: 542838819
   build_vectorstore:
     cmd: python src/stages/build_vectorstore.py data/processed/corpus.pkl data/processed/embedder.pkl
       data/processed/chroma
     deps:
     - path: data/processed/corpus.pkl
       hash: md5
-      md5: 9d4d8f41cb30eefa3345adb0d64b48d3
-      size: 7117
+      md5: c5bff24c94fd2a5433666630fa7bc3f2
+      size: 7363
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: c7bdb2ccbe7fd180f34d6f1da4cc1c23
-      size: 542780257
+      md5: 3c548e18ba48e7b7adc532ffda7988d1
+      size: 542838819
     - path: src/stages/build_vectorstore.py
       hash: md5
-      md5: 43a23fa7f7fbe4214a5250be29da1518
-      size: 1117
+      md5: dd5de97d567f420272e32d6be5b3b118
+      size: 1159
     outs:
     - path: data/processed/chroma
       hash: md5
-      md5: 2c2a6624be2f4433b812a36d20dc3ac8.dir
-      size: 2384612
+      md5: 71925c72783e79e79aa8b1561f06dfa5.dir
+      size: 2400996
       nfiles: 5
   load_vectorstore:
     cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl
@@ -57,24 +57,24 @@ stages:
     deps:
     - path: data/processed/chroma
       hash: md5
-      md5: 2c2a6624be2f4433b812a36d20dc3ac8.dir
-      size: 2384612
+      md5: 71925c72783e79e79aa8b1561f06dfa5.dir
+      size: 2400996
       nfiles: 5
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: c7bdb2ccbe7fd180f34d6f1da4cc1c23
-      size: 542780257
+      md5: 3c548e18ba48e7b7adc532ffda7988d1
+      size: 542838819
     - path: src/stages/load_vectorstore.py
       hash: md5
-      md5: f9e260a2c5534982b17b6190ee2d9fa8
-      size: 1929
+      md5: 9aee0b369d1a0dc2cf96a105a9f11be9
+      size: 2006
   build_ft_dataset:
     cmd: python src/stages/build_ft_dataset.py build_tf_dataset data/processed/ft_dataset.hf
     deps:
     - path: src/stages/build_ft_dataset.py
       hash: md5
-      md5: a56c11e4bd0c11f3fd6fda4c24c01db6
-      size: 3389
+      md5: 32625a229da82d4e7703b3f647ca0590
+      size: 3495
     params:
       params.yaml:
         build_tf_dataset:
@@ -84,8 +84,8 @@ stages:
     outs:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: 0b969931e13b397c610467d97a49c95c.dir
-      size: 15995140
+      md5: a7b0b1c48b9b4498b0b30345ab7a6102.dir
+      size: 15995175
       nfiles: 3
   train_llm:
     cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset.hf ./data/models/llama2-qa-fine-tuned
