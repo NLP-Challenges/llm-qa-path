@@ -47,14 +47,14 @@ def replace_original(source_folder:str, temp_folder:str):
     # delete original folder
     shutil.rmtree(source_folder)
 
-    #move temporary folder to original location
+    # move temporary folder to original location
     shutil.move(temp_folder, source_folder)
 
-#load embedder
+# load embedder
 with open(embedder_filename, 'rb') as f:
     embedder = load(f)
 
-#make a copy of the chroma folder
+# make a copy of the chroma folder
 temp = copy_folder(vector_database_filename)
 
 # load chroma db
@@ -62,13 +62,16 @@ db = Chroma(persist_directory=vector_database_filename, embedding_function=embed
 
 # query
 docs = db.similarity_search(query)
-print(docs[0].page_content)
 
-#disconnect from chroma
+print(f"Found {len(docs)} documents")
+for doc in docs:
+    print(doc.metadata, doc.page_content)
+
+# disconnect from chroma
 del db
 gc.collect()
 
-#wait a sec to avoid simulateous access to files
+# wait a sec to avoid simulateous access to files
 time.sleep(1)
 
 #replace original chroma folder
