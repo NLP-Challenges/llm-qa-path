@@ -64,6 +64,7 @@ for filename in tqdm(os.listdir(data_folder_name), 'Building Corpus'):
             ]
 
             html_splitter = HTMLHeaderTextSplitter(headers_to_split_on=headers_to_split_on)
+            # TODO: add additional character level splitter to reduce to chunk_size=500, chunk_overlap=100
             if space['portrait_content']:
                 portrait_splits = html_splitter.split_text(space['portrait_content'])
                 for portrait_tab in portrait_splits:
