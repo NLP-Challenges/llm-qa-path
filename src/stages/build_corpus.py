@@ -8,7 +8,7 @@ import argparse
 import os
 from typing import Iterable
 import time
-from langchain.text_splitter import HTMLHeaderTextSplitter
+from langchain.text_splitter import HTMLHeaderTextSplitter, RecursiveCharacterTextSplitter
 from langchain.document_loaders import PyPDFLoader
 from langchain.docstore.document import Document
 from langchain.vectorstores import utils as chromautils
@@ -64,14 +64,17 @@ for filename in tqdm(os.listdir(data_folder_name), 'Building Corpus'):
             ]
 
             html_splitter = HTMLHeaderTextSplitter(headers_to_split_on=headers_to_split_on)
-            # TODO: add additional character level splitter to reduce to chunk_size=500, chunk_overlap=100
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=3500, chunk_overlap=200) # 6.38 avg chars per word in german
+
             if space['portrait_content']:
-                portrait_splits = html_splitter.split_text(space['portrait_content'])
+                portrait_heading_splits = html_splitter.split_text(space['portrait_content'])
+                portrait_splits = text_splitter.split_documents(portrait_heading_splits)
                 for portrait_tab in portrait_splits:
                     portrait_tab.metadata = dict(**{ 'Quelle': f'Portrait des {space["name"]} Space' }, **portrait_tab.metadata, **metadata)
                 docs.extend(portrait_splits)
             if space['exercise_content']:
-                exercise_splits = html_splitter.split_text(space['exercise_content'])
+                exercise_heading_splits = html_splitter.split_text(space['exercise_content'])
+                exercise_splits = text_splitter.split_documents(exercise_heading_splits)
                 for exercise_tab in exercise_splits:
                     exercise_tab.metadata = dict(**{ 'Quelle': f'Aufgaben im {space["name"]} Space' }, **exercise_tab.metadata, **metadata)
                 docs.extend(exercise_splits)
