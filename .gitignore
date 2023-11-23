@@ -1,3 +1,4 @@
 .env
 wandb
 .idea
+.DS_Store
