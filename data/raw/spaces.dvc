@@ -1,0 +1,6 @@
+outs:
+- md5: 951bdfeeccb1829be3f0c47c85acc486.dir
+  size: 2296980
+  nfiles: 5
+  hash: md5
+  path: spaces
