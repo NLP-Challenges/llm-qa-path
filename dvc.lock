@@ -10,13 +10,13 @@ stages:
       nfiles: 5
     - path: src/stages/build_corpus.py
       hash: md5
-      md5: 8e7a8ef0afec5d169a59af98b0bd5ff1
-      size: 3932
+      md5: 8a346a2de3d101ccddc7924f8be923be
+      size: 3930
     outs:
     - path: data/processed/corpus.jsonl
       hash: md5
-      md5: f1908e1aa06d02d0b91edd915b890168
-      size: 2280005
+      md5: 7e4eb86ca7bb586af9709d449b32be6c
+      size: 2279035
   build_embedder:
     cmd: python src/stages/build_embedder.py "sentence-transformers/distiluse-base-multilingual-cased-v1"
       data/processed/embedder.pkl
@@ -36,8 +36,8 @@ stages:
     deps:
     - path: data/processed/corpus.jsonl
       hash: md5
-      md5: f5f2f9b4b2c780eefb4d11d1be9701da
-      size: 2278972
+      md5: 7e4eb86ca7bb586af9709d449b32be6c
+      size: 2279035
     - path: data/processed/embedder.pkl
       hash: md5
       md5: c7bdb2ccbe7fd180f34d6f1da4cc1c23
@@ -49,8 +49,8 @@ stages:
     outs:
     - path: data/processed/chroma
       hash: md5
-      md5: 86545c800fcf890bff7dd3d574635c89.dir
-      size: 23791181
+      md5: 405500cac296a2695359bafa5830b28e.dir
+      size: 24299085
       nfiles: 6
   load_vectorstore:
     cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl
@@ -58,8 +58,8 @@ stages:
     deps:
     - path: data/processed/chroma
       hash: md5
-      md5: 86545c800fcf890bff7dd3d574635c89.dir
-      size: 23791181
+      md5: 405500cac296a2695359bafa5830b28e.dir
+      size: 24299085
       nfiles: 6
     - path: data/processed/embedder.pkl
       hash: md5

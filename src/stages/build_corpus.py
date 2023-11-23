@@ -64,7 +64,7 @@ for filename in tqdm(os.listdir(data_folder_name), 'Building Corpus'):
             ]
 
             html_splitter = HTMLHeaderTextSplitter(headers_to_split_on=headers_to_split_on)
-            text_splitter = RecursiveCharacterTextSplitter(chunk_size=3500, chunk_overlap=200) # 6.38 avg chars per word in german
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=3500, chunk_overlap=0) # 6.38 avg chars per word in german
 
             if space['portrait_content']:
                 portrait_heading_splits = html_splitter.split_text(space['portrait_content'])
