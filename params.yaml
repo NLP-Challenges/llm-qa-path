@@ -1,7 +1,7 @@
 build_tf_dataset:
   seed: 1234
-  frac_original: 0.9
-  frag_swapped: 0.1
+  frac_original: 0.06
+  frag_swapped: 0.01
 
 train_llm:
   wandb_params:

@@ -73,19 +73,19 @@ stages:
     deps:
     - path: src/stages/build_ft_dataset.py
       hash: md5
-      md5: 32625a229da82d4e7703b3f647ca0590
-      size: 3495
+      md5: 1f4383340991380f5a855ae5b42d2459
+      size: 3904
     params:
       params.yaml:
         build_tf_dataset:
           seed: 1234
-          frac_original: 0.9
-          frag_swapped: 0.1
+          frac_original: 0.06
+          frag_swapped: 0.01
     outs:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: a7b0b1c48b9b4498b0b30345ab7a6102.dir
-      size: 15995175
+      md5: d4afe1689fb26ba7592c5229ff9c16a2.dir
+      size: 1136617
       nfiles: 3
   train_llm:
     cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset.hf ./data/models/llama2-qa-fine-tuned
