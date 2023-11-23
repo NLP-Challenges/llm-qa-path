@@ -1,80 +1,81 @@
 schema: '2.0'
 stages:
   build_corpus:
-    cmd: python src/stages/build_corpus.py data/raw/example_context.txt data/processed/corpus.pkl
+    cmd: python src/stages/build_corpus.py data/raw/spaces data/processed/corpus.jsonl
     deps:
-    - path: data/raw/example_context.txt
+    - path: data/raw/spaces
       hash: md5
-      md5: 6f1ec549bb9074a2fe151ca623eca5c8
-      size: 7161
+      md5: 951bdfeeccb1829be3f0c47c85acc486.dir
+      size: 2296980
+      nfiles: 5
     - path: src/stages/build_corpus.py
       hash: md5
-      md5: 3b203436718e74c61848b90e16606eb9
-      size: 910
+      md5: 8a346a2de3d101ccddc7924f8be923be
+      size: 3930
     outs:
-    - path: data/processed/corpus.pkl
+    - path: data/processed/corpus.jsonl
       hash: md5
-      md5: c5bff24c94fd2a5433666630fa7bc3f2
-      size: 7363
+      md5: 7e4eb86ca7bb586af9709d449b32be6c
+      size: 2279035
   build_embedder:
     cmd: python src/stages/build_embedder.py "sentence-transformers/distiluse-base-multilingual-cased-v1"
       data/processed/embedder.pkl
     deps:
     - path: src/stages/build_embedder.py
       hash: md5
-      md5: 8bdeab160c9b0d681db86bcb4b75670e
-      size: 733
+      md5: 59ce8507a491acdaea11c4f8adf3da88
+      size: 703
     outs:
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: 3c548e18ba48e7b7adc532ffda7988d1
-      size: 542838819
+      md5: c7bdb2ccbe7fd180f34d6f1da4cc1c23
+      size: 542780257
   build_vectorstore:
-    cmd: python src/stages/build_vectorstore.py data/processed/corpus.pkl data/processed/embedder.pkl
+    cmd: python src/stages/build_vectorstore.py data/processed/corpus.jsonl data/processed/embedder.pkl
       data/processed/chroma
     deps:
-    - path: data/processed/corpus.pkl
+    - path: data/processed/corpus.jsonl
       hash: md5
-      md5: c5bff24c94fd2a5433666630fa7bc3f2
-      size: 7363
+      md5: 7e4eb86ca7bb586af9709d449b32be6c
+      size: 2279035
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: 3c548e18ba48e7b7adc532ffda7988d1
-      size: 542838819
+      md5: c7bdb2ccbe7fd180f34d6f1da4cc1c23
+      size: 542780257
     - path: src/stages/build_vectorstore.py
       hash: md5
-      md5: dd5de97d567f420272e32d6be5b3b118
-      size: 1159
+      md5: a07fbcb839e38027871b96e11d4e6e19
+      size: 1541
     outs:
     - path: data/processed/chroma
       hash: md5
-      md5: 71925c72783e79e79aa8b1561f06dfa5.dir
-      size: 2400996
-      nfiles: 5
+      md5: 405500cac296a2695359bafa5830b28e.dir
+      size: 24299085
+      nfiles: 6
   load_vectorstore:
     cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl
-      "Wo braucht es einen agenten?"
+      "Was weisst du zum  Modul Vertiefende Themen der Analysis?" --strategy selfquery
     deps:
     - path: data/processed/chroma
       hash: md5
-      md5: 71925c72783e79e79aa8b1561f06dfa5.dir
-      size: 2400996
-      nfiles: 5
+      md5: 405500cac296a2695359bafa5830b28e.dir
+      size: 24299085
+      nfiles: 6
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: 3c548e18ba48e7b7adc532ffda7988d1
-      size: 542838819
+      md5: c7bdb2ccbe7fd180f34d6f1da4cc1c23
+      size: 542780257
     - path: src/stages/load_vectorstore.py
       hash: md5
-      md5: 9aee0b369d1a0dc2cf96a105a9f11be9
-      size: 2006
+      md5: a70906b8617399d40d49dc9a84b264d9
+      size: 3474
   build_ft_dataset:
     cmd: python src/stages/build_ft_dataset.py build_tf_dataset data/processed/ft_dataset.hf
     deps:
     - path: src/stages/build_ft_dataset.py
       hash: md5
-      md5: 1f4383340991380f5a855ae5b42d2459
-      size: 3904
+      md5: a56c11e4bd0c11f3fd6fda4c24c01db6
+      size: 3389
     params:
       params.yaml:
         build_tf_dataset:
@@ -97,14 +98,14 @@ stages:
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: ebeb6b929f8d89b2cfc23fafe438fecd
-      size: 4684
+      md5: e9697d3318d1f6fae4ddc6e766d771b3
+      size: 4545
     params:
       params.yaml:
         train_llm:
           wandb_params:
-            entity: t_buess
-            project: chatbot-qa
+            entity: yvokeller
+            project: llm-qa-path
           model_params:
             base_model_id: meta-llama/Llama-2-13b-hf
             max_seq_length: 4096
@@ -157,8 +158,8 @@ stages:
       nfiles: 8
     - path: src/stages/load_llm.py
       hash: md5
-      md5: aef23d6f0180abae2c64510c90dc672a
-      size: 2902
+      md5: a5fda6423d9d317e13acc0260eeed169
+      size: 2818
     params:
       params.yaml:
         load_llm:

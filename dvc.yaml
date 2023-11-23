@@ -1,11 +1,11 @@
 stages:
   build_corpus:
-    cmd: python src/stages/build_corpus.py data/raw/example_context.txt data/processed/corpus.pkl
+    cmd: python src/stages/build_corpus.py data/raw/spaces data/processed/corpus.jsonl
     deps:
       - src/stages/build_corpus.py
-      - data/raw/example_context.txt
+      - data/raw/spaces
     outs:
-      - data/processed/corpus.pkl
+      - data/processed/corpus.jsonl
 
   build_embedder: #https://huggingface.co/sentence-transformers/distiluse-base-multilingual-cased-v1
     cmd: python src/stages/build_embedder.py "sentence-transformers/distiluse-base-multilingual-cased-v1" data/processed/embedder.pkl
@@ -15,16 +15,16 @@ stages:
       - data/processed/embedder.pkl
 
   build_vectorstore:
-    cmd: python src/stages/build_vectorstore.py data/processed/corpus.pkl data/processed/embedder.pkl data/processed/chroma
+    cmd: python src/stages/build_vectorstore.py data/processed/corpus.jsonl data/processed/embedder.pkl data/processed/chroma
     deps:
       - src/stages/build_vectorstore.py
-      - data/processed/corpus.pkl
+      - data/processed/corpus.jsonl
       - data/processed/embedder.pkl
     outs:
       - data/processed/chroma
 
   load_vectorstore:
-    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl "Wo braucht es einen agenten?"
+    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl "Was weisst du zum  Modul Vertiefende Themen der Analysis?" --strategy selfquery
     deps:
       - src/stages/load_vectorstore.py
       - data/processed/chroma

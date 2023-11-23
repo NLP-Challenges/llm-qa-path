@@ -26,3 +26,7 @@ openai==0.28.1
 --extra-index-url https://jllllll.github.io/bitsandbytes-windows-webui
 --prefer-binary
 bitsandbytes
+
+# openai experiment
+lark==1.1.8
+openai==0.28.1
