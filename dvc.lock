@@ -10,8 +10,8 @@ stages:
       nfiles: 5
     - path: src/stages/build_corpus.py
       hash: md5
-      md5: f639f74a615de105d9ee7144adf6928f
-      size: 3574
+      md5: c5b65630041309f8d3cdcdb9bebac159
+      size: 3681
     outs:
     - path: data/processed/corpus.jsonl
       hash: md5
