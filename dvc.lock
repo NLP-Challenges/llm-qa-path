@@ -10,13 +10,13 @@ stages:
       nfiles: 5
     - path: src/stages/build_corpus.py
       hash: md5
-      md5: c5b65630041309f8d3cdcdb9bebac159
-      size: 3681
+      md5: 8e7a8ef0afec5d169a59af98b0bd5ff1
+      size: 3932
     outs:
     - path: data/processed/corpus.jsonl
       hash: md5
-      md5: f5f2f9b4b2c780eefb4d11d1be9701da
-      size: 2278972
+      md5: f1908e1aa06d02d0b91edd915b890168
+      size: 2280005
   build_embedder:
     cmd: python src/stages/build_embedder.py "sentence-transformers/distiluse-base-multilingual-cased-v1"
       data/processed/embedder.pkl
