@@ -57,16 +57,7 @@ ft_tokenizer = AutoTokenizer.from_pretrained(finetuned_path + "/tokenizer")
 def predict(model:PreTrainedModel, tokenizer:LlamaTokenizer, question:str, context:str):
     model.eval()
     
-    prompt = (
-        "Nachfolgend ist eine Frage gestellt mit dem entsprechenden Kontext.\n"
-        "Schreibe eine passende Antwort zur Frage und beziehe den Kontext mit hinein.\n"
-        "Die Antwort soll eine angemessene Länge besitzen.\n\n"
-        "### Frage:\n"
-        f"{question}\n\n"
-        "### Kontext:\n"
-        f"{context}\n\n"
-        "### Antwort:\n"
-    )
+    prompt = f"[INST] Nachfolgend bekommst du eine Frage gestellt mit dem best passenden Kontext. Versuche Frage mithilfe des Kontextes zu beantworten. [/INST]\n\n [FRAGE] {question} [/FRAGE]\n\n [KONTEXT] {context} [/KONTEXT]\n\n ANTWORT:\n"
 
     inputs = tokenizer(prompt, return_tensors="pt")
     outputs = model.generate(

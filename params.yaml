@@ -5,8 +5,8 @@ build_tf_dataset:
 
 train_llm:
   wandb_params:
-    entity: "yvokeller"
-    project: "llm-qa-path"
+    entity: "t_buess"
+    project: "chatbot-qa"
 
   model_params:
     base_model_id: "meta-llama/Llama-2-13b-hf" # mistralai/Mistral-7B-v0.1
@@ -14,15 +14,15 @@ train_llm:
 
   training_config:
     batch_size: 1
-    grad_accumulation_steps: 8
+    grad_accumulation_steps: 32
     optimizer: "paged_adamw_32bit"
     learning_rate: 0.0001
-    max_steps: 100
+    max_steps: 20
     device_map: "auto"
     completion_only: True
 
   LoraConfig:
-    r: 6
+    r: 12
     lora_alpha: 10
     lora_dropout: 0.1
     bias: "none"
@@ -33,6 +33,11 @@ train_llm:
     bnb_4bit_use_double_quant: True
     bnb_4bit_quant_type: "nf4"
     bnb_4bit_compute_dtype: torch.bfloat16
+
+  DatasetColumns:
+    question: "question"
+    context: "context"
+    answer: "answers"
 
 load_llm:
   BitsAndBytesConfig:
