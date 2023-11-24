@@ -174,3 +174,41 @@ stages:
             top_k: 4
             penalty_alpha: 0.6
             temperature: 0.4
+  build_ft_dataset_gpt_context_chunking:
+    cmd: python src/stages/build_ft_dataset_gpt_context_chunking.py data/processed/ft_dataset.hf
+      data/processed/ft_dataset_chunked.hf
+    deps:
+    - path: data/processed/ft_dataset.hf
+      hash: md5
+      md5: 3827c12f0bfcd7903ab43f2fcc709e21.dir
+      size: 1136578
+      nfiles: 3
+    - path: src/stages/build_ft_dataset_gpt_context_chunking.py
+      hash: md5
+      md5: 4ae328263d9956cac501cb670ccee633
+      size: 2998
+    outs:
+    - path: data/processed/ft_dataset_chunked.hf
+      hash: md5
+      md5: 553e76bab0e03dbc4691ea6cf6fab25d.dir
+      size: 20402
+      nfiles: 3
+  build_ft_dataset_gpt_answer:
+    cmd: python src/stages/build_ft_dataset_gpt_answer.py data/processed/ft_dataset_chunked.hf
+      data/processed/ft_dataset_abstractive.hf
+    deps:
+    - path: data/processed/ft_dataset_chunked.hf
+      hash: md5
+      md5: 553e76bab0e03dbc4691ea6cf6fab25d.dir
+      size: 20402
+      nfiles: 3
+    - path: src/stages/build_ft_dataset_gpt_answer.py
+      hash: md5
+      md5: 7d68352d56b051d8629ac4a988607c73
+      size: 4037
+    outs:
+    - path: data/processed/ft_dataset_abstractive.hf
+      hash: md5
+      md5: f4e38ce63449f2dc8f7b19b50b91607f.dir
+      size: 23228
+      nfiles: 3

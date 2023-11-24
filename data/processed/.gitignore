@@ -3,3 +3,5 @@
 /chroma
 /ft_dataset.hf
 /corpus.jsonl
+/ft_dataset_chunked.hf
+/ft_dataset_abstractive.hf
