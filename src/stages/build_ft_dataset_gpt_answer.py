@@ -97,7 +97,7 @@ train_dataset_filename_output = args.train_dataset_filename_output
 df = pd.DataFrame(load_from_disk(train_dataset_filename_input, keep_in_memory=True))
 
 # Setup OpenAI API
-chat = ChatOpenAI(temperature=0, model="gpt-3.5-turbo")
+chat = ChatOpenAI(temperature=0, model="gpt-3.5-turbo", request_timeout=60)
 
 # Generate answers
 df["extractive_answer"] = df.answers
@@ -108,8 +108,6 @@ for index, row in tqdm(df.iterrows(), total=df.shape[0]):
         df.at[index, "answers"] = generate_answer(row["question"], row["context"], row["extractive_answer"])
     else:
         df.at[index, "answers"] = generate_declined_answer(row["question"], row["context"], row["extractive_answer"])
-
-print(df)
 
 # save updated dataset
 datasets.Dataset.from_pandas(df, split="train").save_to_disk(train_dataset_filename_output)

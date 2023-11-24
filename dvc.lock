@@ -10,47 +10,47 @@ stages:
       nfiles: 5
     - path: src/stages/build_corpus.py
       hash: md5
-      md5: 8a346a2de3d101ccddc7924f8be923be
-      size: 3930
+      md5: 24ec12464570f61ff053265036733552
+      size: 4022
     outs:
     - path: data/processed/corpus.jsonl
       hash: md5
-      md5: 7e4eb86ca7bb586af9709d449b32be6c
-      size: 2279035
+      md5: d3b6abdb04a3be0608f2cbf43e2c11c4
+      size: 2281331
   build_embedder:
     cmd: python src/stages/build_embedder.py "sentence-transformers/distiluse-base-multilingual-cased-v1"
       data/processed/embedder.pkl
     deps:
     - path: src/stages/build_embedder.py
       hash: md5
-      md5: 59ce8507a491acdaea11c4f8adf3da88
-      size: 703
+      md5: 8bdeab160c9b0d681db86bcb4b75670e
+      size: 733
     outs:
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: c7bdb2ccbe7fd180f34d6f1da4cc1c23
-      size: 542780257
+      md5: 6f6c0318517b9d518629a8c87eec8154
+      size: 542838819
   build_vectorstore:
     cmd: python src/stages/build_vectorstore.py data/processed/corpus.jsonl data/processed/embedder.pkl
       data/processed/chroma
     deps:
     - path: data/processed/corpus.jsonl
       hash: md5
-      md5: 7e4eb86ca7bb586af9709d449b32be6c
-      size: 2279035
+      md5: d3b6abdb04a3be0608f2cbf43e2c11c4
+      size: 2281331
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: c7bdb2ccbe7fd180f34d6f1da4cc1c23
-      size: 542780257
+      md5: 6f6c0318517b9d518629a8c87eec8154
+      size: 542838819
     - path: src/stages/build_vectorstore.py
       hash: md5
-      md5: a07fbcb839e38027871b96e11d4e6e19
-      size: 1541
+      md5: 1c2dfe9f7e34dab5a56bb1e6b12e3bd5
+      size: 1598
     outs:
     - path: data/processed/chroma
       hash: md5
-      md5: 405500cac296a2695359bafa5830b28e.dir
-      size: 24299085
+      md5: 31fa109a937cb364ad50a7fcefab727a.dir
+      size: 24078853
       nfiles: 6
   load_vectorstore:
     cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl
@@ -58,35 +58,35 @@ stages:
     deps:
     - path: data/processed/chroma
       hash: md5
-      md5: 405500cac296a2695359bafa5830b28e.dir
-      size: 24299085
+      md5: 31fa109a937cb364ad50a7fcefab727a.dir
+      size: 24078853
       nfiles: 6
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: c7bdb2ccbe7fd180f34d6f1da4cc1c23
-      size: 542780257
+      md5: 6f6c0318517b9d518629a8c87eec8154
+      size: 542838819
     - path: src/stages/load_vectorstore.py
       hash: md5
-      md5: a70906b8617399d40d49dc9a84b264d9
-      size: 3474
+      md5: 241968fb40bbfb2ae255ce8cf5049a1d
+      size: 3547
   build_ft_dataset:
     cmd: python src/stages/build_ft_dataset.py build_tf_dataset data/processed/ft_dataset.hf
     deps:
     - path: src/stages/build_ft_dataset.py
       hash: md5
-      md5: 98e410f11f3093a79bf9a2781c6c16d6
-      size: 3775
+      md5: 5d60f46f8c8158176cadac57af2deb48
+      size: 3925
     params:
       params.yaml:
         build_tf_dataset:
           seed: 1234
-          frac_original: 0.06
+          frac_original: 0.03
           frag_swapped: 0.01
     outs:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: 3827c12f0bfcd7903ab43f2fcc709e21.dir
-      size: 1136578
+      md5: a744b6c75b0b4acb10cf9b01cc2fa0ef.dir
+      size: 649484
       nfiles: 3
   train_llm:
     cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset.hf ./data/models/llama2-qa-fine-tuned
@@ -194,21 +194,40 @@ stages:
       size: 20402
       nfiles: 3
   build_ft_dataset_gpt_answer:
-    cmd: python src/stages/build_ft_dataset_gpt_answer.py data/processed/ft_dataset_chunked.hf
+    cmd: python src/stages/build_ft_dataset_gpt_answer.py data/processed/ft_dataset_source_added.hf
       data/processed/ft_dataset_abstractive.hf
     deps:
-    - path: data/processed/ft_dataset_chunked.hf
+    - path: data/processed/ft_dataset_source_added.hf
       hash: md5
-      md5: 553e76bab0e03dbc4691ea6cf6fab25d.dir
-      size: 20402
+      md5: 6d0684fa7f6ea83526c555e42055c9bc.dir
+      size: 707668
       nfiles: 3
     - path: src/stages/build_ft_dataset_gpt_answer.py
       hash: md5
-      md5: 7d68352d56b051d8629ac4a988607c73
-      size: 4037
+      md5: 32648a912bd3424ede6babe9a0db4503
+      size: 4161
     outs:
     - path: data/processed/ft_dataset_abstractive.hf
       hash: md5
-      md5: f4e38ce63449f2dc8f7b19b50b91607f.dir
-      size: 23228
+      md5: 288c6502142739e2f230b24fc41f832b.dir
+      size: 797714
+      nfiles: 3
+  build_ft_dataset_gpt_context_add_source:
+    cmd: python src/stages/build_ft_dataset_gpt_context_add_source.py data/processed/ft_dataset.hf
+      data/processed/ft_dataset_source_added.hf
+    deps:
+    - path: data/processed/ft_dataset.hf
+      hash: md5
+      md5: a744b6c75b0b4acb10cf9b01cc2fa0ef.dir
+      size: 649484
+      nfiles: 3
+    - path: src/stages/build_ft_dataset_gpt_context_add_source.py
+      hash: md5
+      md5: d23af7f37763fab4c6175d324b319995
+      size: 3015
+    outs:
+    - path: data/processed/ft_dataset_source_added.hf
+      hash: md5
+      md5: 6d0684fa7f6ea83526c555e42055c9bc.dir
+      size: 707668
       nfiles: 3

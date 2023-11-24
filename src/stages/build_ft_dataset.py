@@ -101,7 +101,7 @@ print("number of question, context, answer pairs: ", len(df_frac_original))
 print("number of non fitting question, context, answer pairs: ", len(df_frac_swapped))
 
 #concat shortened original and shortened swapped.
-final_df = pd.concat([df_frac_original, df_frac_swapped], ignore_index=True).sample(frac = 1, random_state=params["seed"])
+final_df = pd.concat([df_frac_original, df_frac_swapped], ignore_index=True).sample(frac = 1, random_state=params["seed"]).reset_index(drop=True, inplace=False)
 
 print("final dataset length: ", len(final_df))
 

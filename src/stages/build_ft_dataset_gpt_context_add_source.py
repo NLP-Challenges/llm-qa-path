@@ -34,12 +34,7 @@ def get_chunks(series: pd.Series, max_chunks: int = 4):
 
 def get_source(text:str):
     template = (
-        """Nachfolgend erhälst du einen Text. Bitte erstelle zu diesem Textabschnitt eine mögliche Quelle.
-        Die Quelle soll möglichst kurz und ohne Zusatzinformationen sein.
-        Beispiele: 
-        - Wikipedia
-        - Website xy
-        - (Weitere eigene Quellen)
+        """Stelle dir eine passende Quelle vor für den folgenden Text. Bitte gib nur den Namen der Quelle an, ohne zusätzliche Informationen wie Kapitel, Seitenzahl oder detaillierte Beschreibung.
         """
     )
 
@@ -55,12 +50,11 @@ def get_source(text:str):
 
 def gpt_formatter(series: pd.Series):
     formatted = []
-    for chunks in tqdm(series, title="GPT Context Chunking"):
+    for chunks in tqdm(series):
         formatted.append(json.dumps([{"QUELLE": get_source(text), "INHALT": text} for text in chunks], ensure_ascii=False))
 
     return formatted
 
-load_dotenv()
 parser = argparse.ArgumentParser()
 
 # Add positional arguments
@@ -73,18 +67,16 @@ args = parser.parse_args()
 train_dataset_filename_input = args.train_dataset_filename_input
 train_dataset_filename_output = args.train_dataset_filename_output
 
+load_dotenv()
+
 # load germansquad dataset (train split) and convert to pandas dataframe
 df = pd.DataFrame(load_from_disk(train_dataset_filename_input, keep_in_memory=True))
 
-df = df.iloc[:10]
-
 # Setup OpenAI API
-chat = ChatOpenAI(temperature=0)
+chat = ChatOpenAI(temperature=0, model="gpt-3.5-turbo", request_timeout=60)
 
 df["context"] = get_chunks(df.context)
 df["context"] = gpt_formatter(df.context)
-
-print(df)
 
 # save updated dataset
 datasets.Dataset.from_pandas(df, split="train").save_to_disk(train_dataset_filename_output)

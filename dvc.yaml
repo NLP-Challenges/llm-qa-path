@@ -39,18 +39,18 @@ stages:
     outs:
       - data/processed/ft_dataset.hf
 
-  build_ft_dataset_gpt_context_chunking:
-    cmd: python src/stages/build_ft_dataset_gpt_context_chunking.py data/processed/ft_dataset.hf data/processed/ft_dataset_chunked.hf
+  build_ft_dataset_gpt_context_add_source:
+    cmd: python src/stages/build_ft_dataset_gpt_context_add_source.py data/processed/ft_dataset.hf data/processed/ft_dataset_source_added.hf
     deps:
       - data/processed/ft_dataset.hf
-      - src/stages/build_ft_dataset_gpt_context_chunking.py
+      - src/stages/build_ft_dataset_gpt_context_add_source.py
     outs:
-      - data/processed/ft_dataset_chunked.hf
+      - data/processed/ft_dataset_source_added.hf
 
   build_ft_dataset_gpt_answer:
-    cmd: python src/stages/build_ft_dataset_gpt_answer.py data/processed/ft_dataset_chunked.hf data/processed/ft_dataset_abstractive.hf
+    cmd: python src/stages/build_ft_dataset_gpt_answer.py data/processed/ft_dataset_source_added.hf data/processed/ft_dataset_abstractive.hf
     deps:
-      - data/processed/ft_dataset_chunked.hf
+      - data/processed/ft_dataset_source_added.hf
       - src/stages/build_ft_dataset_gpt_answer.py
     outs:
       - data/processed/ft_dataset_abstractive.hf
