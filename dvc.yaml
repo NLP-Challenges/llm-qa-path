@@ -39,6 +39,22 @@ stages:
     outs:
       - data/processed/ft_dataset.hf
 
+  build_ft_dataset_gpt_context_chunking:
+    cmd: python src/stages/build_ft_dataset_gpt_context_chunking.py data/processed/ft_dataset.hf data/processed/ft_dataset_chunked.hf
+    deps:
+      - data/processed/ft_dataset.hf
+      - src/stages/build_ft_dataset_gpt_context_chunking.py
+    outs:
+      - data/processed/ft_dataset_chunked.hf
+
+  build_ft_dataset_gpt_answer:
+    cmd: python src/stages/build_ft_dataset_gpt_answer.py data/processed/ft_dataset_chunked.hf data/processed/ft_dataset_abstractive.hf
+    deps:
+      - data/processed/ft_dataset_chunked.hf
+      - src/stages/build_ft_dataset_gpt_answer.py
+    outs:
+      - data/processed/ft_dataset_abstractive.hf
+
   #train_llm:
   #  cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset.hf ./data/models/llama2-qa-fine-tuned
   #  deps:
