@@ -65,10 +65,11 @@ stages:
     outs:
       - ./data/models/llama2-qa-fine-tuned
 
-  #load_llm:
-  #  cmd: python src/stages/load_llm.py load_llm ./data/models/llama2-qa-fine-tuned "Auf was spielte Python an?" "Die Sprache wurde Anfang der 1990er Jahre von Guido van Rossum am Centrum Wiskunde & Informatica in Amsterdam als Nachfolger für die Programmier-Lehrsprache ABC entwickelt und war ursprünglich für das verteilte Betriebssystem Amoeba gedacht. Der Name geht nicht, wie das Logo vermuten lässt, auf die gleichnamige Schlangengattung Python zurück, sondern bezog sich ursprünglich auf die englische Komikergruppe Monty Python. In der Dokumentation finden sich daher auch einige Anspielungen auf Sketche aus dem Flying Circus. Trotzdem etablierte sich die Assoziation zur Schlange, was sich unter anderem in der Programmiersprache Cobra[16] sowie dem Python-Toolkit „Boa“[17] äußert. Die erste Vollversion erschien im Januar 1994 unter der Bezeichnung Python 1.0. Gegenüber früheren Versionen wurden einige Konzepte der funktionalen Programmierung implementiert, die allerdings später wieder aufgegeben wurden.[18] Von 1995 bis 2000 erschienen neue Versionen, die fortlaufend als Python 1.1, 1.2 etc. bezeichnet wurden."
-  #  deps:
-  #    - src/stages/load_llm.py
-  #    - ./data/models/llama2-qa-fine-tuned
-  #  params:
-  #    - load_llm
+  load_llm:
+    cmd: python src/stages/load_llm.py load_llm ./data/models/llama2-qa-fine-tuned ./data/raw/example_context.json "Welche Form hat bei der PCA normalerweise der Datensatz?"
+    deps:
+      - src/stages/load_llm.py
+      - ./data/models/llama2-qa-fine-tuned
+      - ./data/raw/example_context.json
+    params:
+      - load_llm

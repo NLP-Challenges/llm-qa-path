@@ -1,7 +1,7 @@
 """
 This script is responsible for the inference of an llm.
 
-Usage: script_name.py params_parent_field(input) finetuned_path(input) question(input) context(input)
+Usage: script_name.py params_parent_field(input) finetuned_path(input) context_path(input) question(input) 
 """
 
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, PreTrainedModel, LlamaTokenizer
@@ -11,22 +11,23 @@ from peft import LoraConfig, PeftModel
 import torch
 import argparse
 import yaml
+import json
 
 parser = argparse.ArgumentParser()
 
 #add positional arguments
 parser.add_argument('params_parent_field')
 parser.add_argument('finetuned_path')
+parser.add_argument('context_path')
 parser.add_argument('question')
-parser.add_argument('context')
 
 args = parser.parse_args()
 
 # Access the arguments
 params_parent_field = args.params_parent_field
 finetuned_path = args.finetuned_path
+context_path = args.context_path
 question = args.question
-context = args.context
 
 # parse params
 with open("params.yaml", 'r') as file:
@@ -35,6 +36,10 @@ with open("params.yaml", 'r') as file:
 #load hugging-face token
 load_dotenv()
 hf_token = os.environ["HF_ACCESS_TOKEN"]
+
+#read context
+with open(context_path, "r", encoding="utf-8") as f:
+    context = json.dumps(json.load(f), ensure_ascii=False)
 
 #load lora config from model
 lora_config = LoraConfig.from_pretrained(finetuned_path + "/model") 
