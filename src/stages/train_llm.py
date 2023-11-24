@@ -50,6 +50,8 @@ grad_accumulation_steps = params["training_config"]["grad_accumulation_steps"]
 optimizer = params["training_config"]["optimizer"]
 learning_rate = params["training_config"]["learning_rate"]
 max_steps = params["training_config"]["max_steps"]
+warmup_steps = params["training_config"]["warmup_steps"]
+lr_scheduler_type = params["training_config"]["lr_scheduler_type"]
 max_seq_length = params["model_params"]["max_seq_length"]
 device_map = params["training_config"]["device_map"]
 train_on_completion_only = params["training_config"]["completion_only"]
@@ -105,10 +107,11 @@ train_args = TrainingArguments(
     per_device_train_batch_size=train_batch_size,
     gradient_accumulation_steps=grad_accumulation_steps,
     learning_rate=learning_rate,
+    warmup_steps=warmup_steps,
     optim=optimizer,
     logging_steps=1,
     max_steps=max_steps,
-    lr_scheduler_type="constant",
+    lr_scheduler_type=lr_scheduler_type,
     group_by_length=True
 )
 

@@ -13,11 +13,13 @@ train_llm:
     max_seq_length: 4096
 
   training_config:
-    batch_size: 1
-    grad_accumulation_steps: 32
+    batch_size: 2
+    grad_accumulation_steps: 16
     optimizer: "paged_adamw_32bit"
     learning_rate: 0.0001
-    max_steps: 20
+    warmup_steps: 5
+    lr_scheduler_type: "cosine"
+    max_steps: 50
     device_map: "auto"
     completion_only: True
 

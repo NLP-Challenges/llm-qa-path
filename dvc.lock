@@ -89,36 +89,39 @@ stages:
       size: 649484
       nfiles: 3
   train_llm:
-    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset.hf ./data/models/llama2-qa-fine-tuned
+    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset_abstractive.hf
+      ./data/models/llama2-qa-fine-tuned
     deps:
-    - path: data/processed/ft_dataset.hf
+    - path: data/processed/ft_dataset_abstractive.hf
       hash: md5
-      md5: a7b0b1c48b9b4498b0b30345ab7a6102.dir
-      size: 15995175
+      md5: 288c6502142739e2f230b24fc41f832b.dir
+      size: 797714
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: e9697d3318d1f6fae4ddc6e766d771b3
-      size: 4545
+      md5: 91e3b4d7e9dc1f6e82a14a5d93d76d35
+      size: 4933
     params:
       params.yaml:
         train_llm:
           wandb_params:
-            entity: yvokeller
-            project: llm-qa-path
+            entity: t_buess
+            project: chatbot-qa
           model_params:
             base_model_id: meta-llama/Llama-2-13b-hf
             max_seq_length: 4096
           training_config:
-            batch_size: 1
-            grad_accumulation_steps: 8
+            batch_size: 2
+            grad_accumulation_steps: 16
             optimizer: paged_adamw_32bit
             learning_rate: 0.0001
-            max_steps: 100
+            warmup_steps: 5
+            lr_scheduler_type: cosine
+            max_steps: 50
             device_map: auto
             completion_only: true
           LoraConfig:
-            r: 6
+            r: 12
             lora_alpha: 10
             lora_dropout: 0.1
             bias: none
@@ -128,11 +131,15 @@ stages:
             bnb_4bit_use_double_quant: true
             bnb_4bit_quant_type: nf4
             bnb_4bit_compute_dtype: torch.bfloat16
+          DatasetColumns:
+            question: question
+            context: context
+            answer: answers
     outs:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: e409354cb726aceff4b594d8673b41b8.dir
-      size: 22063254
+      md5: 5e096f53281a9c89616acbb3b12dcdb4.dir
+      size: 41724055
       nfiles: 8
   load_llm:
     cmd: python src/stages/load_llm.py load_llm ./data/models/llama2-qa-fine-tuned
