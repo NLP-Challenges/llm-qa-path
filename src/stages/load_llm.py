@@ -69,6 +69,7 @@ def predict(model:PreTrainedModel, tokenizer:LlamaTokenizer, question:str, conte
         input_ids=inputs["input_ids"].to(ft_model.device),
         max_new_tokens=params["model_params"]["max_new_tokens"],
         temperature=params["model_params"]["temperature"],
+        do_sample=True,
         
         #Contrastive search: https://huggingface.co/blog/introducing-csearch
         penalty_alpha=params["model_params"]["penalty_alpha"], 

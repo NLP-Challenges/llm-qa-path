@@ -91,11 +91,13 @@ filtered_df.reset_index(drop=True, inplace=True)
 #add new column for "can be answered"
 filtered_df["can_be_answered"] = [True]*len(filtered_df)
 
+print("total number of question, context, answer pairs available: ", len(filtered_df))
+
 #swap context
 swapped = swap_context(filtered_df)
 
-df_frac_original = filtered_df.sample(frac=params["frac_original"], random_state=params["seed"])
-df_frac_swapped = swapped.sample(frac=params["frag_swapped"], random_state=params["seed"])
+df_frac_original = filtered_df.sample(n=params["n_original"], frac=params["frac_original"], random_state=params["seed"])
+df_frac_swapped = swapped.sample(n=params["n_swapped"], frac=params["frac_swapped"], random_state=params["seed"])
 
 print("number of question, context, answer pairs: ", len(df_frac_original))
 print("number of non fitting question, context, answer pairs: ", len(df_frac_swapped))

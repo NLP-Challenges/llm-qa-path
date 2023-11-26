@@ -1,7 +1,9 @@
 build_tf_dataset:
   seed: 1234
-  frac_original: 0.03
-  frag_swapped: 0.01
+  frac_original: null # if provided here n_original must be null
+  frac_swapped: null # if provided here n_swapped must be null
+  n_original: 1500 # if provided here frac_original must be null
+  n_swapped: 500 # if provided here frac_swapped must be null
 
 train_llm:
   wandb_params:
@@ -9,7 +11,7 @@ train_llm:
     project: "chatbot-qa"
 
   model_params:
-    base_model_id: "meta-llama/Llama-2-13b-hf" # mistralai/Mistral-7B-v0.1
+    base_model_id: "flozi00/Llama-2-13b-german-assistant-v4"
     max_seq_length: 4096
 
   training_config:
@@ -18,8 +20,9 @@ train_llm:
     optimizer: "paged_adamw_32bit"
     learning_rate: 0.0001
     warmup_steps: 5
+    logging_steps: 5
     lr_scheduler_type: "cosine"
-    max_steps: 50
+    num_train_epochs: 2
     device_map: "auto"
     completion_only: True
 
@@ -51,6 +54,6 @@ load_llm:
   model_params:
     device_map: "auto"
     max_new_tokens: 200
-    top_k: 4
+    top_k: 6
     penalty_alpha: 0.6
-    temperature: 0.4
+    temperature: 0.3
