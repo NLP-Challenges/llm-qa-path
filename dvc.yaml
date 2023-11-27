@@ -73,3 +73,11 @@ stages:
       - ./data/raw/example_context.json
     params:
       - load_llm
+
+  push_model_to_hub:
+    cmd: python src/stages/push_model_to_hub.py load_llm ./data/models/llama2-qa-fine-tuned "buesst1/chatbot-qa-path"
+    deps:
+      - src/stages/push_model_to_hub.py
+      - ./data/models/llama2-qa-fine-tuned
+    params:
+      - load_llm

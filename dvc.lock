@@ -232,3 +232,30 @@ stages:
       md5: 20db80e9f716adde7444e570aeb095dd.dir
       size: 3220908
       nfiles: 3
+  push_model_to_hub:
+    cmd: python src/stages/push_model_to_hub.py load_llm ./data/models/llama2-qa-fine-tuned
+      "buesst1/chatbot-qa-path"
+    deps:
+    - path: ./data/models/llama2-qa-fine-tuned
+      hash: md5
+      md5: 6c728cc5b5fe545862dfbb1d5bb3b4b7.dir
+      size: 41906103
+      nfiles: 8
+    - path: src/stages/push_model_to_hub.py
+      hash: md5
+      md5: c8a6c269c40f98f614a952271ea3d7d3
+      size: 1619
+    params:
+      params.yaml:
+        load_llm:
+          BitsAndBytesConfig:
+            load_in_4bit: true
+            bnb_4bit_use_double_quant: true
+            bnb_4bit_quant_type: nf4
+            bnb_4bit_compute_dtype: torch.bfloat16
+          model_params:
+            device_map: auto
+            max_new_tokens: 200
+            top_k: 6
+            penalty_alpha: 0.6
+            temperature: 0.3
