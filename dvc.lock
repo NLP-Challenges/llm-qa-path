@@ -234,7 +234,7 @@ stages:
       nfiles: 3
   push_model_to_hub:
     cmd: python src/stages/push_model_to_hub.py load_llm ./data/models/llama2-qa-fine-tuned
-      "buesst1/chatbot-qa-path"
+      "nlpchallenges/chatbot-qa-path"
     deps:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
