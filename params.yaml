@@ -25,6 +25,7 @@ train_llm:
     num_train_epochs: 2
     device_map: "auto"
     completion_only: True
+    neftune_noise_alpha: 5 # if you want to disable NEFTune set this value to null
 
   LoraConfig:
     r: 12
@@ -44,7 +45,7 @@ train_llm:
     context: "context"
     answer: "answers"
 
-load_llm:
+inference:
   BitsAndBytesConfig:
     load_in_4bit: True
     bnb_4bit_use_double_quant: True

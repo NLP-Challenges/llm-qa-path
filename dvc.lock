@@ -101,8 +101,8 @@ stages:
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: 482d6fb503655abaf64591a17f8e724b
-      size: 5033
+      md5: c2e59c5f6f1137f8d676ec7450c1e65c
+      size: 5151
     params:
       params.yaml:
         train_llm:
@@ -123,6 +123,7 @@ stages:
             num_train_epochs: 2
             device_map: auto
             completion_only: true
+            neftune_noise_alpha: 5
           LoraConfig:
             r: 12
             lora_alpha: 10
@@ -141,16 +142,16 @@ stages:
     outs:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 6c728cc5b5fe545862dfbb1d5bb3b4b7.dir
+      md5: 1865b79a3d9789591c82d53e0f945de9.dir
       size: 41906103
       nfiles: 8
   load_llm:
-    cmd: python src/stages/load_llm.py load_llm ./data/models/llama2-qa-fine-tuned
+    cmd: python src/stages/load_llm.py inference ./data/models/llama2-qa-fine-tuned
       ./data/raw/example_context.json "Was ist DVC?"
     deps:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 6c728cc5b5fe545862dfbb1d5bb3b4b7.dir
+      md5: 1865b79a3d9789591c82d53e0f945de9.dir
       size: 41906103
       nfiles: 8
     - path: ./data/raw/example_context.json
@@ -163,7 +164,7 @@ stages:
       size: 2947
     params:
       params.yaml:
-        load_llm:
+        inference:
           BitsAndBytesConfig:
             load_in_4bit: true
             bnb_4bit_use_double_quant: true
@@ -233,12 +234,12 @@ stages:
       size: 3220908
       nfiles: 3
   push_model_to_hub:
-    cmd: python src/stages/push_model_to_hub.py load_llm ./data/models/llama2-qa-fine-tuned
+    cmd: python src/stages/push_model_to_hub.py inference ./data/models/llama2-qa-fine-tuned
       "nlpchallenges/chatbot-qa-path"
     deps:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 6c728cc5b5fe545862dfbb1d5bb3b4b7.dir
+      md5: 1865b79a3d9789591c82d53e0f945de9.dir
       size: 41906103
       nfiles: 8
     - path: src/stages/push_model_to_hub.py
@@ -247,7 +248,7 @@ stages:
       size: 1619
     params:
       params.yaml:
-        load_llm:
+        inference:
           BitsAndBytesConfig:
             load_in_4bit: true
             bnb_4bit_use_double_quant: true

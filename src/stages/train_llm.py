@@ -56,6 +56,7 @@ lr_scheduler_type = params["training_config"]["lr_scheduler_type"]
 max_seq_length = params["model_params"]["max_seq_length"]
 device_map = params["training_config"]["device_map"]
 train_on_completion_only = params["training_config"]["completion_only"]
+neftune_noise_alpha = params["training_config"]["neftune_noise_alpha"]
 dataset_columns = params["DatasetColumns"]
 
 ## Configuration
@@ -123,6 +124,7 @@ fine_tuning = SFTTrainer(
     dataset_text_field="text",
     max_seq_length=max_seq_length,
     args=train_args,
+    neftune_noise_alpha=neftune_noise_alpha,
     data_collator = DataCollatorForCompletionOnlyLM("ANTWORT:\n", tokenizer=tokenizer) if train_on_completion_only else None #train on completion only (text after "ANTWORT:\n") if train_on_completion_only == True
 )
 
