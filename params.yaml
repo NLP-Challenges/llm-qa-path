@@ -11,7 +11,11 @@ train_llm:
     project: "chatbot-qa"
 
   model_params:
-    base_model_id: "flozi00/Llama-2-13b-german-assistant-v4"
+    model_id: "flozi00/Llama-2-13b-german-assistant-v7"
+    override_model_config: "meta-llama/Llama-2-13b-hf" #do you want to use for example a newer model config? -> set this parameter. Otherwise set this parameter to null.
+
+  tokenizer_params:
+    tokenizer_id: "meta-llama/Llama-2-13b-hf"
     max_seq_length: 4096
 
   training_config:
@@ -19,14 +23,14 @@ train_llm:
     grad_accumulation_steps: 16
     optimizer: "paged_adamw_32bit"
     learning_rate: 0.0001
-    warmup_steps: 5
-    logging_steps: 5
-    lr_scheduler_type: "cosine"
-    num_train_epochs: 2
+    warmup_steps: 10
+    logging_steps: 4
+    lr_scheduler_type: "linear"
+    num_train_epochs: 5
     device_map: "auto"
     gradient_checkpointing: True #gradient checkpointing reduces memory overhead but increases computation overhead
     completion_only: True 
-    neftune_noise_alpha: 2 # if you want to disable NEFTune set this value to null
+    neftune_noise_alpha: 5 # if you want to disable NEFTune set this value to null
 
   LoraConfig:
     r: 12

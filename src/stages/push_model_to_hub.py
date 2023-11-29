@@ -30,24 +30,25 @@ load_dotenv()
 hf_token_write = os.environ["HF_ACCESS_TOKEN_WRITE"]
 
 #load lora config from model
-lora_config = LoraConfig.from_pretrained(finetuned_path + "/model") 
+lora_config = LoraConfig.from_pretrained(finetuned_path) 
 
 #define bnb config
 bnb_config = BitsAndBytesConfig(
     **{key:eval(value) if isinstance(value, str) and "torch." in value else value for (key, value) in  params["BitsAndBytesConfig"].items()}
 )
 
-#load model and tokenizer
+#load model
 ft_model = AutoModelForCausalLM.from_pretrained(
     lora_config.base_model_name_or_path, 
     quantization_config=bnb_config, 
     device_map=params["model_params"]["device_map"]
 )
-ft_model = PeftModel.from_pretrained(ft_model, finetuned_path + "/model") #attach lora layers
+ft_model = PeftModel.from_pretrained(ft_model, finetuned_path) #attach lora layers
 
-ft_tokenizer = AutoTokenizer.from_pretrained(finetuned_path + "/tokenizer")
+#load tokenizer
+ft_tokenizer = AutoTokenizer.from_pretrained(finetuned_path)
 
-
-#push model and tokenizer to hub
+#push model, config and tokenizer to hub
 ft_model.push_to_hub(repo_name, token=hf_token_write)
+ft_model.config.push_to_hub(repo_name, token=hf_token_write)
 ft_tokenizer.push_to_hub(repo_name, token=hf_token_write)

@@ -42,7 +42,7 @@ with open(context_path, "r", encoding="utf-8") as f:
     context = json.dumps(json.load(f), ensure_ascii=False)
 
 #load lora config from model
-lora_config = LoraConfig.from_pretrained(finetuned_path + "/model") 
+lora_config = LoraConfig.from_pretrained(finetuned_path) 
 
 #define bnb config
 bnb_config = BitsAndBytesConfig(
@@ -55,9 +55,9 @@ ft_model = AutoModelForCausalLM.from_pretrained(
     quantization_config=bnb_config, 
     device_map=params["model_params"]["device_map"]
 )
-ft_model = PeftModel.from_pretrained(ft_model, finetuned_path + "/model") #attach lora layers
+ft_model = PeftModel.from_pretrained(ft_model, finetuned_path) #attach lora layers
 
-ft_tokenizer = AutoTokenizer.from_pretrained(finetuned_path + "/tokenizer")
+ft_tokenizer = AutoTokenizer.from_pretrained(finetuned_path)
 
 def predict(model:PreTrainedModel, tokenizer:LlamaTokenizer, question:str, context:str):
     model.eval()
