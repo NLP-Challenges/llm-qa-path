@@ -73,8 +73,8 @@ tokenizer = AutoTokenizer.from_pretrained(
     base_model_id,
     token=hf_token,
 )
-tokenizer.pad_token = "</p>" #define padding token
-tokenizer.padding_side = "right" #define padding side
+tokenizer.pad_token = tokenizer.eos_token
+tokenizer.padding_side = "right"
 
 #load model
 base_model = AutoModelForCausalLM.from_pretrained(
