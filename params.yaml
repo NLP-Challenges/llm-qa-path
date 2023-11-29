@@ -24,7 +24,8 @@ train_llm:
     lr_scheduler_type: "cosine"
     num_train_epochs: 2
     device_map: "auto"
-    completion_only: True
+    gradient_checkpointing: True #gradient checkpointing reduces memory overhead but increases computation overhead
+    completion_only: True 
     neftune_noise_alpha: 2 # if you want to disable NEFTune set this value to null
 
   LoraConfig:

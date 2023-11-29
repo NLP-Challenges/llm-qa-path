@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 import os
 from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, BitsAndBytesConfig
 import torch
-from peft import LoraConfig, prepare_model_for_kbit_training, get_peft_model, AutoPeftModelForCausalLM
+from peft import LoraConfig, AutoPeftModelForCausalLM
 from datasets import load_from_disk
 from trl import SFTTrainer, DataCollatorForCompletionOnlyLM
 import yaml
@@ -56,6 +56,7 @@ lr_scheduler_type = params["training_config"]["lr_scheduler_type"]
 max_seq_length = params["model_params"]["max_seq_length"]
 device_map = params["training_config"]["device_map"]
 train_on_completion_only = params["training_config"]["completion_only"]
+gradient_checkpointing = params["training_config"]["gradient_checkpointing"]
 neftune_noise_alpha = params["training_config"]["neftune_noise_alpha"]
 dataset_columns = params["DatasetColumns"]
 
@@ -86,10 +87,6 @@ base_model = AutoModelForCausalLM.from_pretrained(
 base_model.config.use_cache = False
 base_model.config.pretraining_tp = 1
 
-base_model:AutoPeftModelForCausalLM = prepare_model_for_kbit_training(base_model)
-base_model = get_peft_model(base_model, lora_config) # add lora adapters
-base_model.print_trainable_parameters()
-
 ## Load dataset
 def formatter(example):
     #it is required to have a space between "[/KONTEXT]\n\n" and "ANTWORT:\n" because the DataCollatorForCompletionOnlyLM doesn't find the pattern otherwise
@@ -114,7 +111,8 @@ train_args = TrainingArguments(
     logging_steps=logging_steps,
     num_train_epochs=num_train_epochs,
     lr_scheduler_type=lr_scheduler_type,
-    group_by_length=True
+    group_by_length=True,
+    gradient_checkpointing=gradient_checkpointing
 )
 
 fine_tuning = SFTTrainer(
@@ -124,6 +122,7 @@ fine_tuning = SFTTrainer(
     dataset_text_field="text",
     max_seq_length=max_seq_length,
     args=train_args,
+    peft_config=lora_config,
     neftune_noise_alpha=neftune_noise_alpha,
     data_collator = DataCollatorForCompletionOnlyLM("ANTWORT:\n", tokenizer=tokenizer) if train_on_completion_only else None #train on completion only (text after "ANTWORT:\n") if train_on_completion_only == True
 )
