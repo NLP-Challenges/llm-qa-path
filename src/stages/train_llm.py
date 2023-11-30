@@ -8,7 +8,7 @@ import argparse
 import time
 from dotenv import load_dotenv
 import os
-from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, BitsAndBytesConfig, AutoConfig
+from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, BitsAndBytesConfig, AutoConfig, PretrainedConfig
 import torch
 from peft import LoraConfig
 from datasets import load_from_disk
@@ -43,7 +43,8 @@ os.environ["WANDB_PROJECT"] = params["wandb_params"]["project"]
 
 ## Hyperparams
 model_id = params["model_params"]["model_id"]
-override_model_config = params["model_params"]["override_model_config"]
+pre_train_config = params["model_params"]["pre_train_config"]
+post_train_config = params["model_params"]["post_train_config"]
 tokenizer_id = params["tokenizer_params"]["tokenizer_id"]
 max_seq_length = params["tokenizer_params"]["max_seq_length"]
 finetuned_path = ft_output_path
@@ -80,10 +81,16 @@ tokenizer.pad_token = tokenizer.eos_token
 tokenizer.padding_side = "right"
 
 
-#load config if override required
-model_config = None #default none
-if override_model_config:
-    model_config = AutoConfig.from_pretrained(override_model_config)
+#load config 
+model_config:PretrainedConfig = AutoConfig.from_pretrained(model_id)
+
+print("original model config: ")
+print(model_config)
+
+#alter config for training
+if pre_train_config:
+    for key, value in pre_train_config.items():
+        setattr(model_config, key, value)
 
 #load model
 model = AutoModelForCausalLM.from_pretrained(
@@ -93,7 +100,8 @@ model = AutoModelForCausalLM.from_pretrained(
     token=hf_token,
     config=model_config
 )
-model.config.use_cache = False #turn of cache to prevent problems during training!
+print("model config used for training: ")
+print(model_config)
 
 
 ## Load dataset
@@ -137,11 +145,16 @@ trainer = SFTTrainer(
 )
 trainer.train()
 
-trainer.model.config.use_cache = True #turn caching back on again
+model_config:PretrainedConfig = trainer.model.config #get config
+
+#alter config for saving
+if post_train_config:
+    for key, value in post_train_config.items():
+        setattr(model_config, key, value)
 
 ## Save model, tokenizer and model config
 trainer.model.save_pretrained(finetuned_path)
-trainer.model.config.save_pretrained(finetuned_path)
+model_config.save_pretrained(finetuned_path)
 trainer.tokenizer.save_pretrained(finetuned_path)
 
 #wait a sec to avoid simulateous access to files

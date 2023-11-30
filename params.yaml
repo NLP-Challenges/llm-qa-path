@@ -12,10 +12,16 @@ train_llm:
 
   model_params:
     model_id: "flozi00/Llama-2-13b-german-assistant-v7"
-    override_model_config: "meta-llama/Llama-2-13b-hf" #do you want to use for example a newer model config? -> set this parameter. Otherwise set this parameter to null.
+
+    pre_train_config: #do you want to alter the model config before training? If not set this parameter to null!
+      use_cache: False #turn of cache to prevent problems during training!
+      max_position_embeddings: 4096 #max positional encoding wrong in this version of llama 2 13b model -> correction to 4096
+
+    post_train_config: #do you want to alter the model config before saving? If not set this parameter to null!
+      use_cache: True #turn caching back on again
 
   tokenizer_params:
-    tokenizer_id: "meta-llama/Llama-2-13b-hf"
+    tokenizer_id: "flozi00/Llama-2-13b-german-assistant-v7"
     max_seq_length: 4096
 
   training_config:
