@@ -77,8 +77,8 @@ tokenizer = AutoTokenizer.from_pretrained(
     tokenizer_id,
     token=hf_token,
 )
-tokenizer.pad_token = tokenizer.eos_token
-tokenizer.padding_side = "right"
+tokenizer.pad_token = "</p>" #define padding token
+tokenizer.padding_side = "right" #define padding side
 
 
 #load config 
