@@ -124,14 +124,14 @@ stages:
             grad_accumulation_steps: 16
             optimizer: paged_adamw_32bit
             learning_rate: 0.0001
-            warmup_steps: 10
+            warmup_steps: 5
             logging_steps: 4
             lr_scheduler_type: linear
-            num_train_epochs: 5
+            num_train_epochs: 2
             device_map: auto
             gradient_checkpointing: true
             completion_only: true
-            neftune_noise_alpha: 5
+            neftune_noise_alpha: 2
           LoraConfig:
             r: 12
             lora_alpha: 10
@@ -150,7 +150,7 @@ stages:
     outs:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 8ac8243c8f21e235d2b3763a34bbde1b.dir
+      md5: 9ada7d2e1927ff18de86dadff9466171.dir
       size: 41907318
       nfiles: 9
   load_llm:
@@ -159,7 +159,7 @@ stages:
     deps:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 8ac8243c8f21e235d2b3763a34bbde1b.dir
+      md5: 9ada7d2e1927ff18de86dadff9466171.dir
       size: 41907318
       nfiles: 9
     - path: ./data/raw/example_context.json
@@ -250,7 +250,7 @@ stages:
     deps:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 8ac8243c8f21e235d2b3763a34bbde1b.dir
+      md5: 9ada7d2e1927ff18de86dadff9466171.dir
       size: 41907318
       nfiles: 9
     - path: src/stages/push_model_to_hub.py

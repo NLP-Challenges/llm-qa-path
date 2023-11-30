@@ -29,14 +29,14 @@ train_llm:
     grad_accumulation_steps: 16
     optimizer: "paged_adamw_32bit"
     learning_rate: 0.0001
-    warmup_steps: 10
+    warmup_steps: 5
     logging_steps: 4
     lr_scheduler_type: "linear"
-    num_train_epochs: 5
+    num_train_epochs: 2
     device_map: "auto"
     gradient_checkpointing: True #gradient checkpointing reduces memory overhead but increases computation overhead
     completion_only: True 
-    neftune_noise_alpha: 5 # if you want to disable NEFTune set this value to null
+    neftune_noise_alpha: 2 # if you want to disable NEFTune set this value to null
 
   LoraConfig:
     r: 12
