@@ -1,6 +1,6 @@
 
 import argparse
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, AutoConfig
 from peft import LoraConfig, PeftModel
 from dotenv import load_dotenv
 import yaml
@@ -25,30 +25,38 @@ repo_name = args.repo_name
 with open("params.yaml", 'r') as file:
     params = yaml.safe_load(file)[params_parent_field]
 
+# params
+device_map = params["model_params"]["device_map"]
+
+
 #load hugging-face token
 load_dotenv()
 hf_token_write = os.environ["HF_ACCESS_TOKEN_WRITE"]
-
-#load lora config from model
-lora_config = LoraConfig.from_pretrained(finetuned_path) 
 
 #define bnb config
 bnb_config = BitsAndBytesConfig(
     **{key:eval(value) if isinstance(value, str) and "torch." in value else value for (key, value) in  params["BitsAndBytesConfig"].items()}
 )
 
+#load lora config
+lora_config = LoraConfig.from_pretrained(finetuned_path) 
+
+#load model config
+model_config = AutoConfig.from_pretrained(finetuned_path)
+
 #load model
-ft_model = AutoModelForCausalLM.from_pretrained(
+model = AutoModelForCausalLM.from_pretrained(
     lora_config.base_model_name_or_path, 
     quantization_config=bnb_config, 
-    device_map=params["model_params"]["device_map"]
+    device_map=device_map,
+    config=model_config
 )
-ft_model = PeftModel.from_pretrained(ft_model, finetuned_path) #attach lora layers
+model = PeftModel.from_pretrained(model, finetuned_path) #attach lora layers
 
 #load tokenizer
-ft_tokenizer = AutoTokenizer.from_pretrained(finetuned_path)
+tokenizer = AutoTokenizer.from_pretrained(finetuned_path)
 
 #push model, config and tokenizer to hub
-ft_model.push_to_hub(repo_name, token=hf_token_write)
-ft_model.config.push_to_hub(repo_name, token=hf_token_write)
-ft_tokenizer.push_to_hub(repo_name, token=hf_token_write)
+model.push_to_hub(repo_name, token=hf_token_write)
+model.config.push_to_hub(repo_name, token=hf_token_write)
+tokenizer.push_to_hub(repo_name, token=hf_token_write)

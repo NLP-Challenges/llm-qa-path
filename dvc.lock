@@ -168,22 +168,25 @@ stages:
       size: 1041
     - path: src/stages/load_llm.py
       hash: md5
-      md5: 28e4d7c0cb49022a12fb548c7805b852
-      size: 2910
+      md5: 64a38fe9dafea2ad2d3166557a7cf33c
+      size: 3348
     params:
       params.yaml:
         inference:
+          model_params:
+            device_map: auto
+          generation_params:
+            max_new_tokens: 500
+            top_k: 6
+            penalty_alpha: 0.6
+            temperature: 0.3
+          tokenizer_params:
+            max_seq_length: 4096
           BitsAndBytesConfig:
             load_in_4bit: true
             bnb_4bit_use_double_quant: true
             bnb_4bit_quant_type: nf4
             bnb_4bit_compute_dtype: torch.bfloat16
-          model_params:
-            device_map: auto
-            max_new_tokens: 200
-            top_k: 6
-            penalty_alpha: 0.6
-            temperature: 0.3
   build_ft_dataset_gpt_context_chunking:
     cmd: python src/stages/build_ft_dataset_gpt_context_chunking.py data/processed/ft_dataset.hf
       data/processed/ft_dataset_chunked.hf
@@ -252,19 +255,22 @@ stages:
       nfiles: 9
     - path: src/stages/push_model_to_hub.py
       hash: md5
-      md5: c5d1545d38566e96e4b7765b12b3f91f
-      size: 1653
+      md5: da3f2395472188a30e646118a7d3cfc2
+      size: 1779
     params:
       params.yaml:
         inference:
+          model_params:
+            device_map: auto
+          generation_params:
+            max_new_tokens: 500
+            top_k: 6
+            penalty_alpha: 0.6
+            temperature: 0.3
+          tokenizer_params:
+            max_seq_length: 4096
           BitsAndBytesConfig:
             load_in_4bit: true
             bnb_4bit_use_double_quant: true
             bnb_4bit_quant_type: nf4
             bnb_4bit_compute_dtype: torch.bfloat16
-          model_params:
-            device_map: auto
-            max_new_tokens: 200
-            top_k: 6
-            penalty_alpha: 0.6
-            temperature: 0.3
