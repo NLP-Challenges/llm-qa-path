@@ -32,7 +32,7 @@ train_llm:
     warmup_steps: 5
     logging_steps: 4
     lr_scheduler_type: "linear"
-    num_train_epochs: 2
+    num_train_epochs: 1
     device_map: "auto"
     gradient_checkpointing: True #gradient checkpointing reduces memory overhead but increases computation overhead
     completion_only: True 
