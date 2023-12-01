@@ -6,6 +6,8 @@ build_tf_dataset:
   n_swapped: 500 # if provided here frac_swapped must be null
 
 train_llm:
+  hf_hub_repo: "nlpchallenges/chatbot-qa-path" #if you want to enable hub push -> put repo name here otherwise put null
+
   wandb_params:
     entity: "t_buess"
     project: "chatbot-qa"
@@ -32,11 +34,11 @@ train_llm:
     warmup_steps: 5
     logging_steps: 4
     lr_scheduler_type: "linear"
-    num_train_epochs: 1
+    num_train_epochs: 2
     device_map: "auto"
     gradient_checkpointing: True #gradient checkpointing reduces memory overhead but increases computation overhead
     completion_only: True 
-    neftune_noise_alpha: 2 # if you want to disable NEFTune set this value to null
+    neftune_noise_alpha: 1 # if you want to disable NEFTune set this value to null
 
   LoraConfig:
     r: 12

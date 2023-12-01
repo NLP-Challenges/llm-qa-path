@@ -14,6 +14,7 @@ from peft import LoraConfig
 from datasets import load_from_disk
 from trl import SFTTrainer, DataCollatorForCompletionOnlyLM
 import yaml
+import wandb
 
 parser = argparse.ArgumentParser()
 
@@ -27,7 +28,7 @@ args = parser.parse_args()
 # Access the arguments
 params_parent_field = args.params_parent_field
 train_dataset_filename = args.train_dataset_filename
-ft_output_path = args.ft_output_path
+finetuned_path = args.ft_output_path
 
 # parse params
 with open("params.yaml", 'r') as file:
@@ -36,18 +37,19 @@ with open("params.yaml", 'r') as file:
 ##load hugging-face token
 load_dotenv()
 hf_token = os.environ["HF_ACCESS_TOKEN"]
+hf_token_write = os.environ["HF_ACCESS_TOKEN_WRITE"]
 
-##set wandb environment variables
-os.environ["WANDB_ENTITY"] = params["wandb_params"]["entity"]
-os.environ["WANDB_PROJECT"] = params["wandb_params"]["project"]
+##get wandb variables
+wandb_entity= params["wandb_params"]["entity"]
+wandb_project = params["wandb_params"]["project"]
 
 ## Hyperparams
+hf_hub_repo = params["hf_hub_repo"]
 model_id = params["model_params"]["model_id"]
 pre_train_config = params["model_params"]["pre_train_config"]
 post_train_config = params["model_params"]["post_train_config"]
 tokenizer_id = params["tokenizer_params"]["tokenizer_id"]
 max_seq_length = params["tokenizer_params"]["max_seq_length"]
-finetuned_path = ft_output_path
 ft_dataset_filename = train_dataset_filename
 train_batch_size = params["training_config"]["batch_size"]
 grad_accumulation_steps = params["training_config"]["grad_accumulation_steps"]
@@ -129,7 +131,8 @@ train_args = TrainingArguments(
     num_train_epochs=num_train_epochs,
     lr_scheduler_type=lr_scheduler_type,
     group_by_length=True,
-    gradient_checkpointing=gradient_checkpointing
+    gradient_checkpointing=gradient_checkpointing,
+    report_to="wandb"
 )
 
 trainer = SFTTrainer(
@@ -143,6 +146,11 @@ trainer = SFTTrainer(
     neftune_noise_alpha=neftune_noise_alpha,
     data_collator = DataCollatorForCompletionOnlyLM("ANTWORT:\n", tokenizer=tokenizer) if train_on_completion_only else None #train on completion only (text after "ANTWORT:\n") if train_on_completion_only == True
 )
+
+#manually init wandb run and store name
+wandb_run_name = wandb.init(entity=wandb_entity, project=wandb_project).name
+
+#start training
 trainer.train()
 
 model_config:PretrainedConfig = trainer.model.config #get config
@@ -152,10 +160,13 @@ if post_train_config:
     for key, value in post_train_config.items():
         setattr(model_config, key, value)
 
-## Save model, tokenizer and model config
-trainer.model.save_pretrained(finetuned_path)
-model_config.save_pretrained(finetuned_path)
-trainer.tokenizer.save_pretrained(finetuned_path)
+## Save model, tokenizer and model config, upload to hub if required with wandb run name as commit message
+push_to_tub = hf_hub_repo != None
+repo_id = hf_hub_repo if push_to_tub else None
+
+trainer.model.save_pretrained(finetuned_path, push_to_hub=push_to_tub, token=hf_token_write, repo_id=repo_id, commit_message=f"wandb-run-name: {wandb_run_name}")
+model_config.save_pretrained(finetuned_path, push_to_hub=push_to_tub, token=hf_token_write, repo_id=repo_id, commit_message=f"wandb-run-name: {wandb_run_name}")
+trainer.tokenizer.save_pretrained(finetuned_path, push_to_hub=push_to_tub, token=hf_token_write, repo_id=repo_id, commit_message=f"wandb-run-name: {wandb_run_name}")
 
 #wait a sec to avoid simulateous access to files
 time.sleep(1)
