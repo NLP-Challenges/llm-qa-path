@@ -160,13 +160,19 @@ if post_train_config:
     for key, value in post_train_config.items():
         setattr(model_config, key, value)
 
-## Save model, tokenizer and model config, upload to hub if required with wandb run name as commit message
-push_to_tub = hf_hub_repo != None
-repo_id = hf_hub_repo if push_to_tub else None
+## Save model, tokenizer and model config locally
+trainer.model.save_pretrained(finetuned_path)
+model_config.save_pretrained(finetuned_path)
+trainer.tokenizer.save_pretrained(finetuned_path)
 
-trainer.model.save_pretrained(finetuned_path, push_to_hub=push_to_tub, token=hf_token_write, repo_id=repo_id, commit_message=f"wandb-run-name: {wandb_run_name}")
-model_config.save_pretrained(finetuned_path, push_to_hub=push_to_tub, token=hf_token_write, repo_id=repo_id, commit_message=f"wandb-run-name: {wandb_run_name}")
-trainer.tokenizer.save_pretrained(finetuned_path, push_to_hub=push_to_tub, token=hf_token_write, repo_id=repo_id, commit_message=f"wandb-run-name: {wandb_run_name}")
+def create_commit_message(component:str):
+    return f"Update of {component}\n\nWandB run name: ({wandb_run_name})"
+
+#push model, config and tokenizer to hub if required
+if hf_hub_repo != None:
+    trainer.model.push_to_hub(hf_hub_repo, token=hf_token_write, commit_message=create_commit_message("LoRA adapters"))
+    model_config.push_to_hub(hf_hub_repo, token=hf_token_write, commit_message=create_commit_message("model config"))
+    trainer.tokenizer.push_to_hub(hf_hub_repo, token=hf_token_write, commit_message=create_commit_message("tokenizer"))
 
 #wait a sec to avoid simulateous access to files
 time.sleep(1)
