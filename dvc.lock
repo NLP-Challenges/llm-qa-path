@@ -10,47 +10,47 @@ stages:
       nfiles: 5
     - path: src/stages/build_corpus.py
       hash: md5
-      md5: 8a346a2de3d101ccddc7924f8be923be
-      size: 3930
+      md5: 24ec12464570f61ff053265036733552
+      size: 4022
     outs:
     - path: data/processed/corpus.jsonl
       hash: md5
-      md5: 7e4eb86ca7bb586af9709d449b32be6c
-      size: 2279035
+      md5: d3b6abdb04a3be0608f2cbf43e2c11c4
+      size: 2281331
   build_embedder:
     cmd: python src/stages/build_embedder.py "sentence-transformers/distiluse-base-multilingual-cased-v1"
       data/processed/embedder.pkl
     deps:
     - path: src/stages/build_embedder.py
       hash: md5
-      md5: 59ce8507a491acdaea11c4f8adf3da88
-      size: 703
+      md5: 8bdeab160c9b0d681db86bcb4b75670e
+      size: 733
     outs:
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: c7bdb2ccbe7fd180f34d6f1da4cc1c23
-      size: 542780257
+      md5: 6f6c0318517b9d518629a8c87eec8154
+      size: 542838819
   build_vectorstore:
     cmd: python src/stages/build_vectorstore.py data/processed/corpus.jsonl data/processed/embedder.pkl
       data/processed/chroma
     deps:
     - path: data/processed/corpus.jsonl
       hash: md5
-      md5: 7e4eb86ca7bb586af9709d449b32be6c
-      size: 2279035
+      md5: d3b6abdb04a3be0608f2cbf43e2c11c4
+      size: 2281331
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: c7bdb2ccbe7fd180f34d6f1da4cc1c23
-      size: 542780257
+      md5: 6f6c0318517b9d518629a8c87eec8154
+      size: 542838819
     - path: src/stages/build_vectorstore.py
       hash: md5
-      md5: a07fbcb839e38027871b96e11d4e6e19
-      size: 1541
+      md5: 1c2dfe9f7e34dab5a56bb1e6b12e3bd5
+      size: 1598
     outs:
     - path: data/processed/chroma
       hash: md5
-      md5: 405500cac296a2695359bafa5830b28e.dir
-      size: 24299085
+      md5: 31fa109a937cb364ad50a7fcefab727a.dir
+      size: 24078853
       nfiles: 6
   load_vectorstore:
     cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl
@@ -58,67 +58,83 @@ stages:
     deps:
     - path: data/processed/chroma
       hash: md5
-      md5: 405500cac296a2695359bafa5830b28e.dir
-      size: 24299085
+      md5: 31fa109a937cb364ad50a7fcefab727a.dir
+      size: 24078853
       nfiles: 6
     - path: data/processed/embedder.pkl
       hash: md5
-      md5: c7bdb2ccbe7fd180f34d6f1da4cc1c23
-      size: 542780257
+      md5: 6f6c0318517b9d518629a8c87eec8154
+      size: 542838819
     - path: src/stages/load_vectorstore.py
       hash: md5
-      md5: a70906b8617399d40d49dc9a84b264d9
-      size: 3474
+      md5: 241968fb40bbfb2ae255ce8cf5049a1d
+      size: 3547
   build_ft_dataset:
     cmd: python src/stages/build_ft_dataset.py build_tf_dataset data/processed/ft_dataset.hf
     deps:
     - path: src/stages/build_ft_dataset.py
       hash: md5
-      md5: a56c11e4bd0c11f3fd6fda4c24c01db6
-      size: 3389
+      md5: 876e31912924f48fd7aaca976610878e
+      size: 4062
     params:
       params.yaml:
         build_tf_dataset:
           seed: 1234
-          frac_original: 0.9
-          frag_swapped: 0.1
+          frac_original:
+          frac_swapped:
+          n_original: 1500
+          n_swapped: 500
     outs:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: a7b0b1c48b9b4498b0b30345ab7a6102.dir
-      size: 15995175
+      md5: b75ea709d08be1c3e9e50ffd1ffbc01e.dir
+      size: 2946084
       nfiles: 3
   train_llm:
-    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset.hf ./data/models/llama2-qa-fine-tuned
+    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset_abstractive.hf
+      ./data/models/llama2-qa-fine-tuned
     deps:
-    - path: data/processed/ft_dataset.hf
+    - path: data/processed/ft_dataset_abstractive.hf
       hash: md5
-      md5: a7b0b1c48b9b4498b0b30345ab7a6102.dir
-      size: 15995175
+      md5: c115dd21723c641912e3d4cb8381a371.dir
+      size: 3646930
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: e9697d3318d1f6fae4ddc6e766d771b3
-      size: 4545
+      md5: 4ed9a827e42b0dbe927b9609f4c82f11
+      size: 6530
     params:
       params.yaml:
         train_llm:
+          hf_hub_repo: nlpchallenges/chatbot-qa-path
           wandb_params:
-            entity: yvokeller
-            project: llm-qa-path
+            entity: t_buess
+            project: chatbot-qa
           model_params:
-            base_model_id: meta-llama/Llama-2-13b-hf
+            model_id: flozi00/Llama-2-13b-german-assistant-v7
+            pre_train_config:
+              use_cache: false
+              max_position_embeddings: 4096
+            post_train_config:
+              use_cache: true
+          tokenizer_params:
+            tokenizer_id: flozi00/Llama-2-13b-german-assistant-v7
             max_seq_length: 4096
           training_config:
-            batch_size: 1
-            grad_accumulation_steps: 8
+            batch_size: 2
+            grad_accumulation_steps: 16
             optimizer: paged_adamw_32bit
             learning_rate: 0.0001
-            max_steps: 100
+            warmup_steps: 5
+            logging_steps: 4
+            lr_scheduler_type: linear
+            num_train_epochs: 2
             device_map: auto
+            gradient_checkpointing: true
             completion_only: true
+            neftune_noise_alpha: 1
           LoraConfig:
-            r: 6
+            r: 12
             lora_alpha: 10
             lora_dropout: 0.1
             bias: none
@@ -128,49 +144,134 @@ stages:
             bnb_4bit_use_double_quant: true
             bnb_4bit_quant_type: nf4
             bnb_4bit_compute_dtype: torch.bfloat16
+          DatasetColumns:
+            question: question
+            context: context
+            answer: answers
     outs:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: e409354cb726aceff4b594d8673b41b8.dir
-      size: 22063254
-      nfiles: 8
+      md5: ac1fd2b4b6ac0e128cae4b4878ad997d.dir
+      size: 41907318
+      nfiles: 9
   load_llm:
-    cmd: python src/stages/load_llm.py load_llm ./data/models/llama2-qa-fine-tuned
-      "Auf was spielte Python an?" "Die Sprache wurde Anfang der 1990er Jahre von
-      Guido van Rossum am Centrum Wiskunde & Informatica in Amsterdam als Nachfolger
-      für die Programmier-Lehrsprache ABC entwickelt und war ursprünglich für das
-      verteilte Betriebssystem Amoeba gedacht. Der Name geht nicht, wie das Logo vermuten
-      lässt, auf die gleichnamige Schlangengattung Python zurück, sondern bezog sich
-      ursprünglich auf die englische Komikergruppe Monty Python. In der Dokumentation
-      finden sich daher auch einige Anspielungen auf Sketche aus dem Flying Circus.
-      Trotzdem etablierte sich die Assoziation zur Schlange, was sich unter anderem
-      in der Programmiersprache Cobra[16] sowie dem Python-Toolkit „Boa“[17] äußert.
-      Die erste Vollversion erschien im Januar 1994 unter der Bezeichnung Python 1.0.
-      Gegenüber früheren Versionen wurden einige Konzepte der funktionalen Programmierung
-      implementiert, die allerdings später wieder aufgegeben wurden.[18] Von 1995
-      bis 2000 erschienen neue Versionen, die fortlaufend als Python 1.1, 1.2 etc.
-      bezeichnet wurden."
+    cmd: python src/stages/load_llm.py inference ./data/models/llama2-qa-fine-tuned
+      ./data/raw/example_context.json "Was ist DVC?"
     deps:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: e409354cb726aceff4b594d8673b41b8.dir
-      size: 22063254
-      nfiles: 8
+      md5: ac1fd2b4b6ac0e128cae4b4878ad997d.dir
+      size: 41907318
+      nfiles: 9
+    - path: ./data/raw/example_context.json
+      hash: md5
+      md5: 048e156563ef379c22e6988b124fa1c6
+      size: 1041
     - path: src/stages/load_llm.py
       hash: md5
-      md5: a5fda6423d9d317e13acc0260eeed169
-      size: 2818
+      md5: 64a38fe9dafea2ad2d3166557a7cf33c
+      size: 3348
     params:
       params.yaml:
-        load_llm:
+        inference:
+          model_params:
+            device_map: auto
+          generation_params:
+            max_new_tokens: 500
+            top_k: 6
+            penalty_alpha: 0.6
+            temperature: 0.3
+          tokenizer_params:
+            max_seq_length: 4096
           BitsAndBytesConfig:
             load_in_4bit: true
             bnb_4bit_use_double_quant: true
             bnb_4bit_quant_type: nf4
             bnb_4bit_compute_dtype: torch.bfloat16
+  build_ft_dataset_gpt_context_chunking:
+    cmd: python src/stages/build_ft_dataset_gpt_context_chunking.py data/processed/ft_dataset.hf
+      data/processed/ft_dataset_chunked.hf
+    deps:
+    - path: data/processed/ft_dataset.hf
+      hash: md5
+      md5: 3827c12f0bfcd7903ab43f2fcc709e21.dir
+      size: 1136578
+      nfiles: 3
+    - path: src/stages/build_ft_dataset_gpt_context_chunking.py
+      hash: md5
+      md5: 4ae328263d9956cac501cb670ccee633
+      size: 2998
+    outs:
+    - path: data/processed/ft_dataset_chunked.hf
+      hash: md5
+      md5: 553e76bab0e03dbc4691ea6cf6fab25d.dir
+      size: 20402
+      nfiles: 3
+  build_ft_dataset_gpt_answer:
+    cmd: python src/stages/build_ft_dataset_gpt_answer.py data/processed/ft_dataset_source_added.hf
+      data/processed/ft_dataset_abstractive.hf
+    deps:
+    - path: data/processed/ft_dataset_source_added.hf
+      hash: md5
+      md5: 20db80e9f716adde7444e570aeb095dd.dir
+      size: 3220908
+      nfiles: 3
+    - path: src/stages/build_ft_dataset_gpt_answer.py
+      hash: md5
+      md5: 32648a912bd3424ede6babe9a0db4503
+      size: 4161
+    outs:
+    - path: data/processed/ft_dataset_abstractive.hf
+      hash: md5
+      md5: c115dd21723c641912e3d4cb8381a371.dir
+      size: 3646930
+      nfiles: 3
+  build_ft_dataset_gpt_context_add_source:
+    cmd: python src/stages/build_ft_dataset_gpt_context_add_source.py data/processed/ft_dataset.hf
+      data/processed/ft_dataset_source_added.hf
+    deps:
+    - path: data/processed/ft_dataset.hf
+      hash: md5
+      md5: b75ea709d08be1c3e9e50ffd1ffbc01e.dir
+      size: 2946084
+      nfiles: 3
+    - path: src/stages/build_ft_dataset_gpt_context_add_source.py
+      hash: md5
+      md5: d23af7f37763fab4c6175d324b319995
+      size: 3015
+    outs:
+    - path: data/processed/ft_dataset_source_added.hf
+      hash: md5
+      md5: 20db80e9f716adde7444e570aeb095dd.dir
+      size: 3220908
+      nfiles: 3
+  push_model_to_hub:
+    cmd: python src/stages/push_model_to_hub.py inference ./data/models/llama2-qa-fine-tuned
+      "nlpchallenges/chatbot-qa-path"
+    deps:
+    - path: ./data/models/llama2-qa-fine-tuned
+      hash: md5
+      md5: 28757aa1ba3efd9b17c6be6d35e0c799.dir
+      size: 41907318
+      nfiles: 9
+    - path: src/stages/push_model_to_hub.py
+      hash: md5
+      md5: da3f2395472188a30e646118a7d3cfc2
+      size: 1779
+    params:
+      params.yaml:
+        inference:
           model_params:
             device_map: auto
-            max_new_tokens: 200
-            top_k: 4
+          generation_params:
+            max_new_tokens: 500
+            top_k: 6
             penalty_alpha: 0.6
-            temperature: 0.4
+            temperature: 0.3
+          tokenizer_params:
+            max_seq_length: 4096
+          BitsAndBytesConfig:
+            load_in_4bit: true
+            bnb_4bit_use_double_quant: true
+            bnb_4bit_quant_type: nf4
+            bnb_4bit_compute_dtype: torch.bfloat16

@@ -1,0 +1,5 @@
+outs:
+- md5: 048e156563ef379c22e6988b124fa1c6
+  size: 1041
+  hash: md5
+  path: example_context.json

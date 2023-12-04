@@ -46,6 +46,7 @@ def swap_context(df:pd.DataFrame):
         df = df.copy()
         df["context"] = [mapper[key]]*len(df)
         df["answers"] = ["Leider liegen mir dazu keine Informationen vor"]*len(df)
+        df["can_be_answered"] = [False]*len(df)
 
         return df
 
@@ -87,17 +88,24 @@ filtered_df.drop(columns="id", inplace=True)
 #reset index
 filtered_df.reset_index(drop=True, inplace=True)
 
+#add new column for "can be answered"
+filtered_df["can_be_answered"] = [True]*len(filtered_df)
+
+print("total number of question, context, answer pairs available: ", len(filtered_df))
+
 #swap context
 swapped = swap_context(filtered_df)
 
-#concat shortened original and shortened swapped. Also  
-final_df = pd.concat(
-    [
-        filtered_df.sample(frac=params["frac_original"], random_state=params["seed"]), 
-        swapped.sample(frac=params["frag_swapped"], random_state=params["seed"])
-    ], 
-    ignore_index=True
-).sample(frac = 1, random_state=params["seed"])
+df_frac_original = filtered_df.sample(n=params["n_original"], frac=params["frac_original"], random_state=params["seed"])
+df_frac_swapped = swapped.sample(n=params["n_swapped"], frac=params["frac_swapped"], random_state=params["seed"])
+
+print("number of question, context, answer pairs: ", len(df_frac_original))
+print("number of non fitting question, context, answer pairs: ", len(df_frac_swapped))
+
+#concat shortened original and shortened swapped.
+final_df = pd.concat([df_frac_original, df_frac_swapped], ignore_index=True).sample(frac = 1, random_state=params["seed"]).reset_index(drop=True, inplace=False)
+
+print("final dataset length: ", len(final_df))
 
 datasets.Dataset.from_pandas(final_df, split="train").save_to_disk(train_dataset_filename)
 

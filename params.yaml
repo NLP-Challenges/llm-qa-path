@@ -1,28 +1,47 @@
 build_tf_dataset:
   seed: 1234
-  frac_original: 0.9
-  frag_swapped: 0.1
+  frac_original: null # if provided here n_original must be null
+  frac_swapped: null # if provided here n_swapped must be null
+  n_original: 1500 # if provided here frac_original must be null
+  n_swapped: 500 # if provided here frac_swapped must be null
 
 train_llm:
+  hf_hub_repo: "nlpchallenges/chatbot-qa-path" #if you want to enable hub push -> put repo name here otherwise put null
+
   wandb_params:
-    entity: "yvokeller"
-    project: "llm-qa-path"
+    entity: "t_buess"
+    project: "chatbot-qa"
 
   model_params:
-    base_model_id: "meta-llama/Llama-2-13b-hf" # mistralai/Mistral-7B-v0.1
+    model_id: "flozi00/Llama-2-13b-german-assistant-v7"
+
+    pre_train_config: #do you want to alter the model config before training? If not set this parameter to null!
+      use_cache: False #turn of cache to prevent problems during training!
+      max_position_embeddings: 4096 #max positional encoding wrong in this version of llama 2 13b model -> correction to 4096
+
+    post_train_config: #do you want to alter the model config before saving? If not set this parameter to null!
+      use_cache: True #turn caching back on again
+
+  tokenizer_params:
+    tokenizer_id: "flozi00/Llama-2-13b-german-assistant-v7"
     max_seq_length: 4096
 
   training_config:
-    batch_size: 1
-    grad_accumulation_steps: 8
+    batch_size: 2
+    grad_accumulation_steps: 16
     optimizer: "paged_adamw_32bit"
     learning_rate: 0.0001
-    max_steps: 100
+    warmup_steps: 5
+    logging_steps: 4
+    lr_scheduler_type: "linear"
+    num_train_epochs: 2
     device_map: "auto"
-    completion_only: True
+    gradient_checkpointing: True #gradient checkpointing reduces memory overhead but increases computation overhead
+    completion_only: True 
+    neftune_noise_alpha: 1 # if you want to disable NEFTune set this value to null
 
   LoraConfig:
-    r: 6
+    r: 12
     lora_alpha: 10
     lora_dropout: 0.1
     bias: "none"
@@ -34,16 +53,26 @@ train_llm:
     bnb_4bit_quant_type: "nf4"
     bnb_4bit_compute_dtype: torch.bfloat16
 
-load_llm:
+  DatasetColumns:
+    question: "question"
+    context: "context"
+    answer: "answers"
+
+inference:
+  model_params:
+    device_map: "auto"
+
+  generation_params:
+    max_new_tokens: 500
+    top_k: 6
+    penalty_alpha: 0.6
+    temperature: 0.3
+
+  tokenizer_params:
+    max_seq_length: 4096
+
   BitsAndBytesConfig:
     load_in_4bit: True
     bnb_4bit_use_double_quant: True
     bnb_4bit_quant_type: "nf4"
     bnb_4bit_compute_dtype: torch.bfloat16
-
-  model_params:
-    device_map: "auto"
-    max_new_tokens: 200
-    top_k: 4
-    penalty_alpha: 0.6
-    temperature: 0.4

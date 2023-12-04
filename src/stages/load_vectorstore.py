@@ -14,6 +14,7 @@ import shutil
 import tempfile
 import os
 import gc
+import psutil
 
 # env vars
 load_dotenv()
@@ -36,7 +37,7 @@ embedder_filename = args.embedder_filename
 query = args.query
 strategy = args.strategy
 
-def copy_folder(source_folder:str):
+def copy_to_temp_folder(source_folder:str):
     # create a temporary folder
     temp_folder = tempfile.mkdtemp()
 
@@ -51,22 +52,23 @@ def copy_folder(source_folder:str):
 
     return temp_folder
 
-def replace_original(source_folder:str, temp_folder:str):
-    # delete original folder
-    shutil.rmtree(source_folder)
+def delete_folder(folder:str):
+    try:
+        # try delete folder
+        shutil.rmtree(folder)
 
-    # move temporary folder to original location
-    shutil.move(temp_folder, source_folder)
+    except Exception as ex: 
+        print(f"Temporaray folder could not be deleted: {ex}. The folder has to be deleted manually!")    
 
 # load embedder
 with open(embedder_filename, 'rb') as f:
     embedder = load(f)
 
 # make a copy of the chroma folder
-temp = copy_folder(vector_database_filename)
+temp = copy_to_temp_folder(vector_database_filename)
 
-# load chroma db
-vectorstore = Chroma(persist_directory=vector_database_filename, embedding_function=embedder)
+# load chroma db from temporary folder
+vectorstore = Chroma(persist_directory=temp, embedding_function=embedder)
 
 if strategy == 'similarity':
     # query
@@ -113,11 +115,8 @@ elif strategy == 'selfquery':
 del vectorstore
 gc.collect()
 
-# wait a sec to avoid simulateous access to files
-time.sleep(1)
-
-#replace original chroma folder
-replace_original(vector_database_filename, temp)
+#delete temporary folder
+delete_folder(temp)
 
 #wait a sec to avoid simulateous access to files
 time.sleep(1)

@@ -39,20 +39,45 @@ stages:
     outs:
       - data/processed/ft_dataset.hf
 
+  build_ft_dataset_gpt_context_add_source:
+    cmd: python src/stages/build_ft_dataset_gpt_context_add_source.py data/processed/ft_dataset.hf data/processed/ft_dataset_source_added.hf
+    deps:
+      - data/processed/ft_dataset.hf
+      - src/stages/build_ft_dataset_gpt_context_add_source.py
+    outs:
+      - data/processed/ft_dataset_source_added.hf
+
+  build_ft_dataset_gpt_answer:
+    cmd: python src/stages/build_ft_dataset_gpt_answer.py data/processed/ft_dataset_source_added.hf data/processed/ft_dataset_abstractive.hf
+    deps:
+      - data/processed/ft_dataset_source_added.hf
+      - src/stages/build_ft_dataset_gpt_answer.py
+    outs:
+      - data/processed/ft_dataset_abstractive.hf
+
   train_llm:
-    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset.hf ./data/models/llama2-qa-fine-tuned
+    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset_abstractive.hf ./data/models/llama2-qa-fine-tuned
     deps:
       - src/stages/train_llm.py
-      - data/processed/ft_dataset.hf
+      - data/processed/ft_dataset_abstractive.hf
     params:
       - train_llm
     outs:
       - ./data/models/llama2-qa-fine-tuned
 
   load_llm:
-    cmd: python src/stages/load_llm.py load_llm ./data/models/llama2-qa-fine-tuned "Auf was spielte Python an?" "Die Sprache wurde Anfang der 1990er Jahre von Guido van Rossum am Centrum Wiskunde & Informatica in Amsterdam als Nachfolger für die Programmier-Lehrsprache ABC entwickelt und war ursprünglich für das verteilte Betriebssystem Amoeba gedacht. Der Name geht nicht, wie das Logo vermuten lässt, auf die gleichnamige Schlangengattung Python zurück, sondern bezog sich ursprünglich auf die englische Komikergruppe Monty Python. In der Dokumentation finden sich daher auch einige Anspielungen auf Sketche aus dem Flying Circus. Trotzdem etablierte sich die Assoziation zur Schlange, was sich unter anderem in der Programmiersprache Cobra[16] sowie dem Python-Toolkit „Boa“[17] äußert. Die erste Vollversion erschien im Januar 1994 unter der Bezeichnung Python 1.0. Gegenüber früheren Versionen wurden einige Konzepte der funktionalen Programmierung implementiert, die allerdings später wieder aufgegeben wurden.[18] Von 1995 bis 2000 erschienen neue Versionen, die fortlaufend als Python 1.1, 1.2 etc. bezeichnet wurden."
+    cmd: python src/stages/load_llm.py inference ./data/models/llama2-qa-fine-tuned ./data/raw/example_context.json "Was ist DVC?"
     deps:
       - src/stages/load_llm.py
       - ./data/models/llama2-qa-fine-tuned
+      - ./data/raw/example_context.json
     params:
-      - load_llm
+      - inference
+
+#  push_model_to_hub:
+#    cmd: python src/stages/push_model_to_hub.py inference ./data/models/llama2-qa-fine-tuned "nlpchallenges/chatbot-qa-path"
+#    deps:
+#      - src/stages/push_model_to_hub.py
+#      - ./data/models/llama2-qa-fine-tuned
+#    params:
+#      - inference
