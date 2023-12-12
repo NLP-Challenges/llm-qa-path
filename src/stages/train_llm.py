@@ -8,13 +8,15 @@ import argparse
 import time
 from dotenv import load_dotenv
 import os
-from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, BitsAndBytesConfig, AutoConfig, PretrainedConfig
+from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, BitsAndBytesConfig, AutoConfig, PretrainedConfig, EarlyStoppingCallback, EvalPrediction
 import torch
 from peft import LoraConfig
 from datasets import load_from_disk
 from trl import SFTTrainer, DataCollatorForCompletionOnlyLM
 import yaml
 import wandb
+from sacrebleu import corpus_bleu
+import numpy as np
 
 parser = argparse.ArgumentParser()
 
@@ -51,7 +53,7 @@ post_train_config = params["model_params"]["post_train_config"]
 tokenizer_id = params["tokenizer_params"]["tokenizer_id"]
 max_seq_length = params["tokenizer_params"]["max_seq_length"]
 ft_dataset_filename = train_dataset_filename
-train_batch_size = params["training_config"]["batch_size"]
+train_batch_size = params["training_config"]["train_batch_size"]
 grad_accumulation_steps = params["training_config"]["grad_accumulation_steps"]
 optimizer = params["training_config"]["optimizer"]
 learning_rate = params["training_config"]["learning_rate"]
@@ -64,6 +66,13 @@ train_on_completion_only = params["training_config"]["completion_only"]
 gradient_checkpointing = params["training_config"]["gradient_checkpointing"]
 neftune_noise_alpha = params["training_config"]["neftune_noise_alpha"]
 dataset_columns = params["DatasetColumns"]
+
+val_batch_size = params["validation_config"]["val_batch_size"]
+validate_every_n_steps = params["validation_config"]["validate_every_n_steps"]
+val_metrics = params["validation_config"]["val_metrics"]
+metric_for_best_model = params["validation_config"]["metric_for_best_model"]
+greater_is_better = params["validation_config"]["greater_is_better"]
+early_stopping_patience = params["validation_config"]["early_stopping_patience"]
 
 ## Configuration
 lora_config = LoraConfig(
@@ -113,16 +122,21 @@ def formatter(example):
 
     return {"text": prompt}
 
-#load train dataset
-train_dataset = load_from_disk(ft_dataset_filename, keep_in_memory=True)
+#load train dataset and map formatter
+full_dataset = load_from_disk(ft_dataset_filename, keep_in_memory=True).map(formatter)
 
-#add text column
-train_dataset = train_dataset.map(formatter)
+train_split = full_dataset.filter(lambda x: x['split'] == 'train')#get training split
+val_split = full_dataset.filter(lambda x: x['split'] == "val") #get validation split
+test_split = full_dataset.filter(lambda x: x['split'] == "test") #get test split
+
+#sanity check
+assert len(full_dataset) == len(train_split) + len(val_split) + len(test_split), f"Something went wrong during the splitting process of the dataset... All the splits together have a length of {len(train_split) + len(val_split) + len(test_split)} but it has to sum up to {len(full_dataset)}"
 
 ## Start training
 train_args = TrainingArguments(
     output_dir=finetuned_path + "/train-out",
     per_device_train_batch_size=train_batch_size,
+    per_device_eval_batch_size=val_batch_size,
     gradient_accumulation_steps=grad_accumulation_steps,
     learning_rate=learning_rate,
     warmup_steps=warmup_steps,
@@ -130,22 +144,52 @@ train_args = TrainingArguments(
     logging_steps=logging_steps,
     num_train_epochs=num_train_epochs,
     lr_scheduler_type=lr_scheduler_type,
-    group_by_length=True,
+    group_by_length=True, #try to put same length inputs into the same batch
     gradient_checkpointing=gradient_checkpointing,
-    report_to="wandb"
+    report_to="wandb", #MLOps plattform
+    evaluation_strategy="steps", #validate every n steps (eval_steps)
+    save_strategy="steps", #checkpointing strategy must be the same as evaluation_strategy
+    eval_steps=validate_every_n_steps,
+    load_best_model_at_end=True, #if true -> the model with the lowest validation loss will be loaded after training
+    metric_for_best_model=metric_for_best_model,
+    greater_is_better=greater_is_better
 )
+
+#define validation metrics here
+def compute_val_metrics(eval_pred: EvalPrediction):
+    logits, labels = eval_pred
+    predictions = np.argmax(logits, axis=-1) #convert logits to ids
+
+    return_dict = {} #this dictionary will be filled and returned
+
+    # decode predictions and labels
+    decoded_preds = [tokenizer.decode(pred, skip_special_tokens=True, clean_up_tokenization_spaces=True) for pred in predictions]
+    decoded_labels = [tokenizer.decode(label[label != -100], skip_special_tokens=True, clean_up_tokenization_spaces=True) for label in labels] #remove padding (-100) added to labels by trainer
+
+    #if bleu score requested
+    if 'bleu' in val_metrics:
+        return_dict['bleu'] = corpus_bleu(decoded_preds, [decoded_labels]).score
+
+    return return_dict
 
 trainer = SFTTrainer(
     model=model,
     tokenizer=tokenizer,
-    train_dataset=train_dataset,
-    dataset_text_field="text",
+    train_dataset=train_split,
+    eval_dataset=val_split,
+    compute_metrics=compute_val_metrics, #compute those metrics during validation
+    dataset_text_field="text", #column with inputs for training, val, ... in datasets
     max_seq_length=max_seq_length,
     args=train_args,
     peft_config=lora_config,
     neftune_noise_alpha=neftune_noise_alpha,
     data_collator = DataCollatorForCompletionOnlyLM("ANTWORT:\n", tokenizer=tokenizer) if train_on_completion_only else None #train on completion only (text after "ANTWORT:\n") if train_on_completion_only == True
 )
+
+# add EarlyStoppingCallback
+trainer.add_callback(EarlyStoppingCallback(
+    early_stopping_patience=early_stopping_patience
+))
 
 #manually init wandb run and store name
 wandb_run_name = wandb.init(entity=wandb_entity, project=wandb_project).name

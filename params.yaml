@@ -27,18 +27,26 @@ train_llm:
     max_seq_length: 4096
 
   training_config:
-    batch_size: 2
-    grad_accumulation_steps: 16
+    train_batch_size: 1
+    grad_accumulation_steps: 1
     optimizer: "paged_adamw_32bit"
     learning_rate: 0.0001
-    warmup_steps: 5
-    logging_steps: 4
+    warmup_steps: 0
+    logging_steps: 1
     lr_scheduler_type: "linear"
-    num_train_epochs: 2
+    num_train_epochs: 5
     device_map: "auto"
     gradient_checkpointing: True #gradient checkpointing reduces memory overhead but increases computation overhead
-    completion_only: True 
-    neftune_noise_alpha: 1 # if you want to disable NEFTune set this value to null
+    completion_only: True #only calculate the loss with respect to the completions if true
+    neftune_noise_alpha: 1 #if you want to disable NEFTune set this value to null
+
+  validation_config:
+    val_batch_size: 16
+    validate_every_n_steps: 1 #calculate validation metrics on val split every n steps
+    val_metrics: ['bleu'] #which metrics will be calculated, you can choose between ['bleu']. You can put in muliple metrics. The loss will always be calculated.
+    metric_for_best_model: "loss" #which metric should be used for determining the best model
+    greater_is_better: False #true -> best model where metric_for_best_model is highest, false ->  best model where metric_for_best_model is lowest (has to be used if metric_for_best_model is the loss)
+    early_stopping_patience: 3 #if model is not getting better within {early_stopping_patience} according to validation metric -> stop training
 
   LoraConfig:
     r: 12
@@ -57,6 +65,8 @@ train_llm:
     question: "question"
     context: "context"
     answer: "answers"
+    split: "split" #column where each element is "train", "val" or "test"
+    can_be_answered: "can_be_answered" #boolean column which describes if question can be answered from context.
 
 inference:
   model_params:
