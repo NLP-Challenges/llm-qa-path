@@ -34,7 +34,7 @@ train_llm:
     warmup_steps: 0
     logging_steps: 1
     lr_scheduler_type: "linear"
-    num_train_epochs: 5
+    num_train_epochs: 1
     device_map: "auto"
     gradient_checkpointing: True #gradient checkpointing reduces memory overhead but increases computation overhead
     completion_only: True #only calculate the loss with respect to the completions if true
@@ -43,9 +43,6 @@ train_llm:
   validation_config:
     val_batch_size: 16
     validate_every_n_steps: 1 #calculate validation metrics on val split every n steps
-    val_metrics: ['bleu'] #which metrics will be calculated, you can choose between ['bleu']. You can put in muliple metrics. The loss will always be calculated.
-    metric_for_best_model: "loss" #which metric should be used for determining the best model
-    greater_is_better: False #true -> best model where metric_for_best_model is highest, false ->  best model where metric_for_best_model is lowest (has to be used if metric_for_best_model is the loss)
     early_stopping_patience: 3 #if model is not getting better within {early_stopping_patience} according to validation metric -> stop training
 
   LoraConfig:

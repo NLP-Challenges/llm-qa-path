@@ -69,9 +69,6 @@ dataset_columns = params["DatasetColumns"]
 
 val_batch_size = params["validation_config"]["val_batch_size"]
 validate_every_n_steps = params["validation_config"]["validate_every_n_steps"]
-val_metrics = params["validation_config"]["val_metrics"]
-metric_for_best_model = params["validation_config"]["metric_for_best_model"]
-greater_is_better = params["validation_config"]["greater_is_better"]
 early_stopping_patience = params["validation_config"]["early_stopping_patience"]
 
 ## Configuration
@@ -114,16 +111,8 @@ model = AutoModelForCausalLM.from_pretrained(
 print("model config used for training: ")
 print(model_config)
 
-
-## Load dataset
-def formatter(example):
-    #it is required to have a space between "[/KONTEXT]\n\n" and "ANTWORT:\n" because the DataCollatorForCompletionOnlyLM doesn't find the pattern otherwise
-    prompt = f"[INST] Nachfolgend bekommst du eine Frage gestellt mit dem best passenden Kontext. Versuche Frage mithilfe des Kontextes zu beantworten. [/INST]\n\n [FRAGE] {example[dataset_columns['question']]} [/FRAGE]\n\n [KONTEXT] {example[dataset_columns['context']]} [/KONTEXT]\n\n ANTWORT:\n{example[dataset_columns['answer']]}{tokenizer.eos_token}"
-
-    return {"text": prompt}
-
-#load train dataset and map formatter
-full_dataset = load_from_disk(ft_dataset_filename, keep_in_memory=True).map(formatter)
+#load train dataset
+full_dataset = load_from_disk(ft_dataset_filename, keep_in_memory=True)
 
 train_split = full_dataset.filter(lambda x: x['split'] == 'train')#get training split
 val_split = full_dataset.filter(lambda x: x['split'] == "val") #get validation split
@@ -151,8 +140,8 @@ train_args = TrainingArguments(
     save_strategy="steps", #checkpointing strategy must be the same as evaluation_strategy
     eval_steps=validate_every_n_steps,
     load_best_model_at_end=True, #if true -> the model with the lowest validation loss will be loaded after training
-    metric_for_best_model=metric_for_best_model,
-    greater_is_better=greater_is_better
+    metric_for_best_model="loss", #use validation loss as metric for best model 
+    greater_is_better=False #we use loss as metric for best model -> lowest loss is better
 )
 
 #define validation metrics here
@@ -166,19 +155,24 @@ def compute_val_metrics(eval_pred: EvalPrediction):
     decoded_preds = [tokenizer.decode(pred, skip_special_tokens=True, clean_up_tokenization_spaces=True) for pred in predictions]
     decoded_labels = [tokenizer.decode(label[label != -100], skip_special_tokens=True, clean_up_tokenization_spaces=True) for label in labels] #remove padding (-100) added to labels by trainer
 
-    #if bleu score requested
-    if 'bleu' in val_metrics:
-        return_dict['bleu'] = corpus_bleu(decoded_preds, [decoded_labels]).score
+    return_dict['bleu'] = corpus_bleu(decoded_preds, [decoded_labels]).score
 
     return return_dict
+
+def formatting_func(example):
+    output_texts = []
+    for question, context, answer in zip(example[dataset_columns['question']], example[dataset_columns['context']], example[dataset_columns['answer']]):
+        prompt = f"[INST] Nachfolgend bekommst du eine Frage gestellt mit dem best passenden Kontext. Versuche Frage mithilfe des Kontextes zu beantworten. [/INST]\n\n [FRAGE] {question} [/FRAGE]\n\n [KONTEXT] {context} [/KONTEXT]\n\n ANTWORT:\n{answer}{tokenizer.eos_token}"
+        output_texts.append(prompt)
+    
+    return output_texts
 
 trainer = SFTTrainer(
     model=model,
     tokenizer=tokenizer,
     train_dataset=train_split,
     eval_dataset=val_split,
-    compute_metrics=compute_val_metrics, #compute those metrics during validation
-    dataset_text_field="text", #column with inputs for training, val, ... in datasets
+    formatting_func=formatting_func,
     max_seq_length=max_seq_length,
     args=train_args,
     peft_config=lora_config,
@@ -197,6 +191,7 @@ wandb_run_name = wandb.init(entity=wandb_entity, project=wandb_project).name
 #start training
 trainer.train()
 
+##model saving 
 model_config:PretrainedConfig = trainer.model.config #get config
 
 #alter config for saving
