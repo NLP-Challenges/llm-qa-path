@@ -16,7 +16,7 @@ from trl import SFTTrainer, DataCollatorForCompletionOnlyLM
 import yaml
 import wandb
 from sacrebleu import corpus_bleu
-import numpy as np
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 
@@ -161,7 +161,7 @@ def generate_predictions(model, tokenizer, test_split):
 
     predictions = []
     labels = []
-    for i,prompt in enumerate(formatting_func(test_split, eval=True)):
+    for i, prompt in enumerate(tqdm(formatting_func(test_split, eval=True))):
 
         #tokenize and make prediction
         inputs = tokenizer(prompt, return_tensors='pt', padding=False, truncation=True, max_length=max_seq_length-max_new_tokens).input_ids
@@ -175,7 +175,8 @@ def generate_predictions(model, tokenizer, test_split):
 def test_stage(trainer: SFTTrainer):
     test_predictions, labels = generate_predictions(trainer.model, trainer.tokenizer, test_split)
     bleu_score = corpus_bleu(test_predictions, [labels]).score
-    trainer.log_metrics("test", {"bleu": bleu_score})
+
+    trainer.log({"test_bleu": bleu_score})
 
 trainer = SFTTrainer(
     model=model,

@@ -6,7 +6,7 @@ build_tf_dataset:
   n_swapped: 500 # if provided here frac_swapped must be null
 
 train_llm:
-  hf_hub_repo: null #"nlpchallenges/chatbot-qa-path" #if you want to enable hub push -> put repo name here otherwise put null
+  hf_hub_repo: "nlpchallenges/chatbot-qa-path" #if you want to enable hub push -> put repo name here otherwise put null
 
   wandb_params:
     entity: "t_buess"
@@ -25,7 +25,7 @@ train_llm:
   tokenizer_params:
     tokenizer_id: "flozi00/Llama-2-13b-german-assistant-v7"
     max_seq_length: 4096
-    max_new_tokens: 50
+    max_new_tokens: 100 #used for test stage
 
   training_config:
     train_batch_size: 1
