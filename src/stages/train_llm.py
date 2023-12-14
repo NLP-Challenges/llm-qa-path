@@ -17,6 +17,8 @@ import yaml
 import wandb
 from sacrebleu import corpus_bleu
 from tqdm import tqdm
+import wandb
+import numpy as np
 
 parser = argparse.ArgumentParser()
 
@@ -160,23 +162,34 @@ def generate_predictions(model, tokenizer, test_split):
     model.eval() # Setzt das Modell in den Evaluierungsmodus
 
     predictions = []
-    labels = []
-    for i, prompt in enumerate(tqdm(formatting_func(test_split, eval=True))):
+    for prompt in tqdm(formatting_func(test_split, eval=True)):
 
         #tokenize and make prediction
         inputs = tokenizer(prompt, return_tensors='pt', padding=False, truncation=True, max_length=max_seq_length-max_new_tokens).input_ids
-        decoded_preds = tokenizer.decode(model.generate(input_ids=inputs.to(model.device), max_new_tokens=max_new_tokens)[0], skip_special_tokens=True)
+        decoded_preds = tokenizer.decode(model.generate(input_ids=inputs.to(model.device), max_new_tokens=max_new_tokens)[0][inputs.shape[1]:], skip_special_tokens=True)
 
         predictions.append(decoded_preds)
-        labels.append(test_split[i][dataset_columns['answer']])
 
-    return predictions, labels
+    return predictions
 
 def test_stage(trainer: SFTTrainer):
-    test_predictions, labels = generate_predictions(trainer.model, trainer.tokenizer, test_split)
-    bleu_score = corpus_bleu(test_predictions, [labels]).score
+    predictions = generate_predictions(trainer.model, trainer.tokenizer, test_split)
+    bleu_score = corpus_bleu(predictions, [test_split[dataset_columns['answer']]]).score
 
     trainer.log({"test_bleu": bleu_score})
+
+    table = wandb.Table(
+        columns=["context", "question", "answer", "predictions"],
+        data=np.array([
+            test_split[dataset_columns['context']],
+            test_split[dataset_columns['question']],
+            test_split[dataset_columns['answer']],
+            predictions
+        ]).T
+    )
+
+    wandb.log({"test/predictions" : table})
+    
 
 trainer = SFTTrainer(
     model=model,

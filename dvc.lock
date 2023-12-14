@@ -100,12 +100,12 @@ stages:
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: 07b467c8ee2d7947fcb05170b1199588
-      size: 9311
+      md5: f53801b2816836ca284178066110d498
+      size: 9633
     params:
       params.yaml:
         train_llm:
-          hf_hub_repo:
+          hf_hub_repo: nlpchallenges/chatbot-qa-path
           wandb_params:
             entity: t_buess
             project: chatbot-qa
@@ -157,7 +157,7 @@ stages:
     outs:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 2a589f3c934ec19edfc4e8d3927d9857.dir
+      md5: 4e259a08539a5d1d9a5c8e86307a0992.dir
       size: 41907318
       nfiles: 9
   load_llm:
@@ -166,7 +166,7 @@ stages:
     deps:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 2a589f3c934ec19edfc4e8d3927d9857.dir
+      md5: 4e259a08539a5d1d9a5c8e86307a0992.dir
       size: 41907318
       nfiles: 9
     - path: ./data/raw/example_context.json
