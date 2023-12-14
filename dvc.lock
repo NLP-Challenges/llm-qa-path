@@ -91,18 +91,17 @@ stages:
       size: 2946084
       nfiles: 3
   train_llm:
-    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset_abstractive.hf
-      ./data/models/llama2-qa-fine-tuned
+    cmd: python src/stages/train_llm.py train_llm data/processed/test_data.hf ./data/models/llama2-qa-fine-tuned
     deps:
-    - path: data/processed/ft_dataset_abstractive.hf
+    - path: data/processed/test_data.hf
       hash: md5
-      md5: c115dd21723c641912e3d4cb8381a371.dir
-      size: 3646930
+      md5: fdd5a3b6ce855f65c0ff402442c19b0b.dir
+      size: 10169
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: 4ed9a827e42b0dbe927b9609f4c82f11
-      size: 6530
+      md5: f53801b2816836ca284178066110d498
+      size: 9633
     params:
       params.yaml:
         train_llm:
@@ -120,19 +119,24 @@ stages:
           tokenizer_params:
             tokenizer_id: flozi00/Llama-2-13b-german-assistant-v7
             max_seq_length: 4096
+            max_new_tokens: 100
           training_config:
-            batch_size: 2
-            grad_accumulation_steps: 16
+            train_batch_size: 1
+            grad_accumulation_steps: 1
             optimizer: paged_adamw_32bit
             learning_rate: 0.0001
-            warmup_steps: 5
-            logging_steps: 4
+            warmup_steps: 0
+            logging_steps: 1
             lr_scheduler_type: linear
-            num_train_epochs: 2
+            num_train_epochs: 1
             device_map: auto
             gradient_checkpointing: true
             completion_only: true
             neftune_noise_alpha: 1
+          validation_config:
+            val_batch_size: 16
+            validate_every_n_steps: 1
+            early_stopping_patience: 3
           LoraConfig:
             r: 12
             lora_alpha: 10
@@ -148,10 +152,12 @@ stages:
             question: question
             context: context
             answer: answers
+            split: split
+            can_be_answered: can_be_answered
     outs:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: ac1fd2b4b6ac0e128cae4b4878ad997d.dir
+      md5: 4e259a08539a5d1d9a5c8e86307a0992.dir
       size: 41907318
       nfiles: 9
   load_llm:
@@ -160,7 +166,7 @@ stages:
     deps:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: ac1fd2b4b6ac0e128cae4b4878ad997d.dir
+      md5: 4e259a08539a5d1d9a5c8e86307a0992.dir
       size: 41907318
       nfiles: 9
     - path: ./data/raw/example_context.json

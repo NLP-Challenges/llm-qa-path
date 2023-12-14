@@ -3,7 +3,7 @@ torch
 torchvision
 torchaudio
 
-dvc==3.24.0
+dvc==3.33.3
 dvc-gdrive==2.20.0
 langchain==0.0.316
 dill==0.3.7
@@ -23,6 +23,7 @@ openai==0.28.1
 lark==1.1.8
 pypdf==3.17.1
 lxml==4.9.3
+sacrebleu==2.4.0
 #bitsandbytes==0.41.1 # only works for linux, macos ....why....(sad emoji here)
 
 #windows workaround

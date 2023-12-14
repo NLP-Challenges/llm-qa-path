@@ -8,13 +8,17 @@ import argparse
 import time
 from dotenv import load_dotenv
 import os
-from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, BitsAndBytesConfig, AutoConfig, PretrainedConfig
+from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, BitsAndBytesConfig, AutoConfig, PretrainedConfig, EarlyStoppingCallback, EvalPrediction
 import torch
 from peft import LoraConfig
 from datasets import load_from_disk
 from trl import SFTTrainer, DataCollatorForCompletionOnlyLM
 import yaml
 import wandb
+from sacrebleu import corpus_bleu
+from tqdm import tqdm
+import wandb
+import numpy as np
 
 parser = argparse.ArgumentParser()
 
@@ -50,8 +54,9 @@ pre_train_config = params["model_params"]["pre_train_config"]
 post_train_config = params["model_params"]["post_train_config"]
 tokenizer_id = params["tokenizer_params"]["tokenizer_id"]
 max_seq_length = params["tokenizer_params"]["max_seq_length"]
+max_new_tokens = params["tokenizer_params"]["max_new_tokens"]
 ft_dataset_filename = train_dataset_filename
-train_batch_size = params["training_config"]["batch_size"]
+train_batch_size = params["training_config"]["train_batch_size"]
 grad_accumulation_steps = params["training_config"]["grad_accumulation_steps"]
 optimizer = params["training_config"]["optimizer"]
 learning_rate = params["training_config"]["learning_rate"]
@@ -64,6 +69,10 @@ train_on_completion_only = params["training_config"]["completion_only"]
 gradient_checkpointing = params["training_config"]["gradient_checkpointing"]
 neftune_noise_alpha = params["training_config"]["neftune_noise_alpha"]
 dataset_columns = params["DatasetColumns"]
+
+val_batch_size = params["validation_config"]["val_batch_size"]
+validate_every_n_steps = params["validation_config"]["validate_every_n_steps"]
+early_stopping_patience = params["validation_config"]["early_stopping_patience"]
 
 ## Configuration
 lora_config = LoraConfig(
@@ -105,24 +114,21 @@ model = AutoModelForCausalLM.from_pretrained(
 print("model config used for training: ")
 print(model_config)
 
-
-## Load dataset
-def formatter(example):
-    #it is required to have a space between "[/KONTEXT]\n\n" and "ANTWORT:\n" because the DataCollatorForCompletionOnlyLM doesn't find the pattern otherwise
-    prompt = f"[INST] Nachfolgend bekommst du eine Frage gestellt mit dem best passenden Kontext. Versuche Frage mithilfe des Kontextes zu beantworten. [/INST]\n\n [FRAGE] {example[dataset_columns['question']]} [/FRAGE]\n\n [KONTEXT] {example[dataset_columns['context']]} [/KONTEXT]\n\n ANTWORT:\n{example[dataset_columns['answer']]}{tokenizer.eos_token}"
-
-    return {"text": prompt}
-
 #load train dataset
-train_dataset = load_from_disk(ft_dataset_filename, keep_in_memory=True)
+full_dataset = load_from_disk(ft_dataset_filename, keep_in_memory=True)
 
-#add text column
-train_dataset = train_dataset.map(formatter)
+train_split = full_dataset.filter(lambda x: x['split'] == 'train')#get training split
+val_split = full_dataset.filter(lambda x: x['split'] == "val") #get validation split
+test_split = full_dataset.filter(lambda x: x['split'] == "test") #get test split
+
+#sanity check
+assert len(full_dataset) == len(train_split) + len(val_split) + len(test_split), f"Something went wrong during the splitting process of the dataset... All the splits together have a length of {len(train_split) + len(val_split) + len(test_split)} but it has to sum up to {len(full_dataset)}"
 
 ## Start training
 train_args = TrainingArguments(
     output_dir=finetuned_path + "/train-out",
     per_device_train_batch_size=train_batch_size,
+    per_device_eval_batch_size=val_batch_size,
     gradient_accumulation_steps=grad_accumulation_steps,
     learning_rate=learning_rate,
     warmup_steps=warmup_steps,
@@ -130,16 +136,67 @@ train_args = TrainingArguments(
     logging_steps=logging_steps,
     num_train_epochs=num_train_epochs,
     lr_scheduler_type=lr_scheduler_type,
-    group_by_length=True,
+    group_by_length=True, #try to put same length inputs into the same batch
     gradient_checkpointing=gradient_checkpointing,
-    report_to="wandb"
+    report_to="wandb", #MLOps plattform
+    evaluation_strategy="steps", #validate every n steps (eval_steps)
+    save_strategy="steps", #checkpointing strategy must be the same as evaluation_strategy
+    eval_steps=validate_every_n_steps,
+    load_best_model_at_end=True, #if true -> the model with the lowest validation loss will be loaded after training
+    metric_for_best_model="loss", #use validation loss as metric for best model 
+    greater_is_better=False #we use loss as metric for best model -> lowest loss is better
 )
+
+def formatting_func(dataset, eval=False):
+    output_texts = []
+    for question, context, answer in zip(dataset[dataset_columns['question']], dataset[dataset_columns['context']], dataset[dataset_columns['answer']]):
+        prompt = f"[INST] Nachfolgend bekommst du eine Frage gestellt mit dem best passenden Kontext. Versuche Frage mithilfe des Kontextes zu beantworten. [/INST]\n\n [FRAGE] {question} [/FRAGE]\n\n [KONTEXT] {context} [/KONTEXT]\n\n ANTWORT:\n"
+        
+        prompt += f"{answer}{tokenizer.eos_token}" if not eval else "" #add answer if not in eval mode
+        
+        output_texts.append(prompt)
+    
+    return output_texts
+
+def generate_predictions(model, tokenizer, test_split):
+    model.eval() # Setzt das Modell in den Evaluierungsmodus
+
+    predictions = []
+    for prompt in tqdm(formatting_func(test_split, eval=True)):
+
+        #tokenize and make prediction
+        inputs = tokenizer(prompt, return_tensors='pt', padding=False, truncation=True, max_length=max_seq_length-max_new_tokens).input_ids
+        decoded_preds = tokenizer.decode(model.generate(input_ids=inputs.to(model.device), max_new_tokens=max_new_tokens)[0][inputs.shape[1]:], skip_special_tokens=True)
+
+        predictions.append(decoded_preds)
+
+    return predictions
+
+def test_stage(trainer: SFTTrainer):
+    predictions = generate_predictions(trainer.model, trainer.tokenizer, test_split)
+    bleu_score = corpus_bleu(predictions, [test_split[dataset_columns['answer']]]).score
+
+    trainer.log({"test_bleu": bleu_score})
+
+    table = wandb.Table(
+        columns=["context", "question", "answer", "predictions"],
+        data=np.array([
+            test_split[dataset_columns['context']],
+            test_split[dataset_columns['question']],
+            test_split[dataset_columns['answer']],
+            predictions
+        ]).T
+    )
+
+    wandb.log({"test/predictions" : table})
+    
 
 trainer = SFTTrainer(
     model=model,
     tokenizer=tokenizer,
-    train_dataset=train_dataset,
-    dataset_text_field="text",
+    train_dataset=train_split,
+    eval_dataset=val_split,
+    formatting_func=formatting_func,
     max_seq_length=max_seq_length,
     args=train_args,
     peft_config=lora_config,
@@ -147,12 +204,21 @@ trainer = SFTTrainer(
     data_collator = DataCollatorForCompletionOnlyLM("ANTWORT:\n", tokenizer=tokenizer) if train_on_completion_only else None #train on completion only (text after "ANTWORT:\n") if train_on_completion_only == True
 )
 
+# add EarlyStoppingCallback
+trainer.add_callback(EarlyStoppingCallback(
+    early_stopping_patience=early_stopping_patience
+))
+
 #manually init wandb run and store name
 wandb_run_name = wandb.init(entity=wandb_entity, project=wandb_project).name
 
 #start training
 trainer.train()
 
+##test stage
+test_stage(trainer)
+
+##model saving 
 model_config:PretrainedConfig = trainer.model.config #get config
 
 #alter config for saving
