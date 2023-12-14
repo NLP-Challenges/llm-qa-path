@@ -52,6 +52,7 @@ pre_train_config = params["model_params"]["pre_train_config"]
 post_train_config = params["model_params"]["post_train_config"]
 tokenizer_id = params["tokenizer_params"]["tokenizer_id"]
 max_seq_length = params["tokenizer_params"]["max_seq_length"]
+max_new_tokens = params["tokenizer_params"]["max_new_tokens"]
 ft_dataset_filename = train_dataset_filename
 train_batch_size = params["training_config"]["train_batch_size"]
 grad_accumulation_steps = params["training_config"]["grad_accumulation_steps"]
@@ -144,28 +145,37 @@ train_args = TrainingArguments(
     greater_is_better=False #we use loss as metric for best model -> lowest loss is better
 )
 
-#define validation metrics here
-def compute_val_metrics(eval_pred: EvalPrediction):
-    logits, labels = eval_pred
-    predictions = np.argmax(logits, axis=-1) #convert logits to ids
-
-    return_dict = {} #this dictionary will be filled and returned
-
-    # decode predictions and labels
-    decoded_preds = [tokenizer.decode(pred, skip_special_tokens=True, clean_up_tokenization_spaces=True) for pred in predictions]
-    decoded_labels = [tokenizer.decode(label[label != -100], skip_special_tokens=True, clean_up_tokenization_spaces=True) for label in labels] #remove padding (-100) added to labels by trainer
-
-    return_dict['bleu'] = corpus_bleu(decoded_preds, [decoded_labels]).score
-
-    return return_dict
-
-def formatting_func(example):
+def formatting_func(dataset, eval=False):
     output_texts = []
-    for question, context, answer in zip(example[dataset_columns['question']], example[dataset_columns['context']], example[dataset_columns['answer']]):
-        prompt = f"[INST] Nachfolgend bekommst du eine Frage gestellt mit dem best passenden Kontext. Versuche Frage mithilfe des Kontextes zu beantworten. [/INST]\n\n [FRAGE] {question} [/FRAGE]\n\n [KONTEXT] {context} [/KONTEXT]\n\n ANTWORT:\n{answer}{tokenizer.eos_token}"
+    for question, context, answer in zip(dataset[dataset_columns['question']], dataset[dataset_columns['context']], dataset[dataset_columns['answer']]):
+        prompt = f"[INST] Nachfolgend bekommst du eine Frage gestellt mit dem best passenden Kontext. Versuche Frage mithilfe des Kontextes zu beantworten. [/INST]\n\n [FRAGE] {question} [/FRAGE]\n\n [KONTEXT] {context} [/KONTEXT]\n\n ANTWORT:\n"
+        
+        prompt += f"{answer}{tokenizer.eos_token}" if not eval else "" #add answer if not in eval mode
+        
         output_texts.append(prompt)
     
     return output_texts
+
+def generate_predictions(model, tokenizer, test_split):
+    model.eval() # Setzt das Modell in den Evaluierungsmodus
+
+    predictions = []
+    labels = []
+    for i,prompt in enumerate(formatting_func(test_split, eval=True)):
+
+        #tokenize and make prediction
+        inputs = tokenizer(prompt, return_tensors='pt', padding=False, truncation=True, max_length=max_seq_length-max_new_tokens).input_ids
+        decoded_preds = tokenizer.decode(model.generate(input_ids=inputs.to(model.device), max_new_tokens=max_new_tokens)[0], skip_special_tokens=True)
+
+        predictions.append(decoded_preds)
+        labels.append(test_split[i][dataset_columns['answer']])
+
+    return predictions, labels
+
+def test_stage(trainer: SFTTrainer):
+    test_predictions, labels = generate_predictions(trainer.model, trainer.tokenizer, test_split)
+    bleu_score = corpus_bleu(test_predictions, [labels]).score
+    trainer.log_metrics("test", {"bleu": bleu_score})
 
 trainer = SFTTrainer(
     model=model,
@@ -190,6 +200,9 @@ wandb_run_name = wandb.init(entity=wandb_entity, project=wandb_project).name
 
 #start training
 trainer.train()
+
+##test stage
+test_stage(trainer)
 
 ##model saving 
 model_config:PretrainedConfig = trainer.model.config #get config
