@@ -75,7 +75,7 @@ stages:
       - inference
 
 #  push_model_to_hub:
-#    cmd: python src/stages/push_model_to_hub.py inference ./data/models/llama2-qa-fine-tuned "nlpchallenges/chatbot-qa-path"
+#    cmd: python src/stages/push_model_to_hub.py ./data/models/llama2-qa-fine-tuned "nlpchallenges/chatbot-qa-path"
 #    deps:
 #      - src/stages/push_model_to_hub.py
 #      - ./data/models/llama2-qa-fine-tuned
