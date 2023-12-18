@@ -74,6 +74,15 @@ stages:
     params:
       - inference
 
+  eval_retrieval_question_gen:
+    cmd: python src/stages/eval_retrieval_question_gen.py data/processed/chroma data/processed/embedder.pkl data/processed/eval_retrieval_questions.parquet
+    deps:
+      - src/stages/eval_retrieval_question_gen.py
+      - data/processed/chroma
+      - data/processed/embedder.pkl
+    outs:
+      - data/processed/eval_retrieval_questions.parquet
+
 #  push_model_to_hub:
 #    cmd: python src/stages/push_model_to_hub.py inference ./data/models/llama2-qa-fine-tuned "nlpchallenges/chatbot-qa-path"
 #    deps:

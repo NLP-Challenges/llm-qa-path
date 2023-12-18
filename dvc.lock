@@ -281,3 +281,25 @@ stages:
             bnb_4bit_use_double_quant: true
             bnb_4bit_quant_type: nf4
             bnb_4bit_compute_dtype: torch.bfloat16
+  eval_retrieval_question_gen:
+    cmd: python src/stages/eval_retrieval_question_gen.py data/processed/chroma data/processed/embedder.pkl
+      data/processed/eval_retrieval_questions.parquet
+    deps:
+    - path: data/processed/chroma
+      hash: md5
+      md5: 31fa109a937cb364ad50a7fcefab727a.dir
+      size: 24078853
+      nfiles: 6
+    - path: data/processed/embedder.pkl
+      hash: md5
+      md5: 6f6c0318517b9d518629a8c87eec8154
+      size: 542838819
+    - path: src/stages/eval_retrieval_question_gen.py
+      hash: md5
+      md5: 90bec23d3dd78c3f47d8e70481db81d8
+      size: 3965
+    outs:
+    - path: data/processed/eval_retrieval_questions.parquet
+      hash: md5
+      md5: a51786d2bcc858286c02dcaba362f8c7
+      size: 116501
