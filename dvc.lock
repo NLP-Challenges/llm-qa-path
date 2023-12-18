@@ -306,6 +306,7 @@ stages:
   eval_retrieval_metrics:
     cmd: python src/stages/eval_retrieval_metrics.py data/processed/chroma data/processed/embedder.pkl
       data/processed/eval_retrieval_questions.parquet data/processed/eval_retrieval_metrics.json
+      data/processed/eval_retrieval_ranks.csv
     deps:
     - path: data/processed/chroma
       hash: md5
@@ -322,10 +323,14 @@ stages:
       size: 116501
     - path: src/stages/eval_retrieval_metrics.py
       hash: md5
-      md5: 79fd72f10c19ecc58769a1b960bfd55b
-      size: 2786
+      md5: f6263f27e0b1864735b0662049a781c7
+      size: 3012
     outs:
     - path: data/processed/eval_retrieval_metrics.json
       hash: md5
-      md5: 24ed7b98a892936e330abf8aa963f736
+      md5: 4aca5190a3368a3b21a972ea3701c228
       size: 28
+    - path: data/processed/eval_retrieval_ranks.csv
+      hash: md5
+      md5: 3051e49f7b7e2eb0b42b493d247c0ae6
+      size: 173837

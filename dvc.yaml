@@ -84,7 +84,7 @@ stages:
       - data/processed/eval_retrieval_questions.parquet
 
   eval_retrieval_metrics:
-    cmd: python src/stages/eval_retrieval_metrics.py data/processed/chroma data/processed/embedder.pkl data/processed/eval_retrieval_questions.parquet data/processed/eval_retrieval_metrics.json
+    cmd: python src/stages/eval_retrieval_metrics.py data/processed/chroma data/processed/embedder.pkl data/processed/eval_retrieval_questions.parquet data/processed/eval_retrieval_metrics.json data/processed/eval_retrieval_ranks.csv
     deps:
       - src/stages/eval_retrieval_metrics.py
       - data/processed/chroma
@@ -92,6 +92,7 @@ stages:
       - data/processed/eval_retrieval_questions.parquet
     outs:
       - data/processed/eval_retrieval_metrics.json
+      - data/processed/eval_retrieval_ranks.csv
 
 #  push_model_to_hub:
 #    cmd: python src/stages/push_model_to_hub.py inference ./data/models/llama2-qa-fine-tuned "nlpchallenges/chatbot-qa-path"

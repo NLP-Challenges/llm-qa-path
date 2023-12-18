@@ -1,7 +1,7 @@
 """
 Generates metrics for evaluating the retrieval
 
-Usage: script_name.py vector_database_filename(input) embedder_filename(input) questions_file(input) metrics_file(output)
+Usage: script_name.py vector_database_filename(input) embedder_filename(input) questions_file(input) metrics_file(output) ranks_file(output)
 """
 
 from langchain.vectorstores import Chroma
@@ -22,6 +22,7 @@ parser.add_argument('vector_database_filename')
 parser.add_argument('embedder_filename')
 parser.add_argument('questions_file')
 parser.add_argument('metrics_file')
+parser.add_argument('ranks_file')
 
 args = parser.parse_args()
 
@@ -30,6 +31,7 @@ vector_database_filename = args.vector_database_filename
 embedder_filename = args.embedder_filename
 questions_file = args.questions_file
 metrics_file = args.metrics_file
+ranks_file = args.ranks_file
 
 def copy_to_temp_folder(source_folder:str):
     # create a temporary folder
@@ -70,6 +72,7 @@ df = pd.read_parquet(questions_file)
 
 #iterate over questions
 ranks = []
+questions = []
 for i, row in tqdm(df.iterrows(), total=len(df)):
     block_id, question = row.loc["id"], row.loc["question"] #get block id and question which was generated to that block
 
@@ -83,10 +86,9 @@ for i, row in tqdm(df.iterrows(), total=len(df)):
     block_rank = np.argwhere(np.array(block_ids_search) == block_id).flatten()[0] + 1
 
     ranks.append(block_rank)
+    questions.append(question)
 
 mrr = np.mean(1 / np.array(ranks)) #calculate the mean reciprocal rank
-
-print("ranks: ", ranks)
 
 #try to delete folder with db
 delete_folder(temp)
@@ -94,3 +96,10 @@ delete_folder(temp)
 #write json to output
 with open(metrics_file, "w") as f:
     f.write(json.dumps({"mrr":mrr})) 
+
+#write ranks file to output
+pd.DataFrame({
+    "question": questions,
+    "rank": ranks
+}).to_csv(ranks_file)
+
