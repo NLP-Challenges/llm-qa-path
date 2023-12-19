@@ -8,7 +8,8 @@ import argparse
 import time
 from dotenv import load_dotenv
 import os
-from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, BitsAndBytesConfig, AutoConfig, PretrainedConfig, EarlyStoppingCallback, EvalPrediction
+from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, BitsAndBytesConfig, AutoConfig, PretrainedConfig, EarlyStoppingCallback
+from huggingface_hub import HfApi
 import torch
 from peft import LoraConfig
 from datasets import load_from_disk
@@ -190,7 +191,6 @@ def test_stage(trainer: SFTTrainer):
 
     wandb.log({"test/predictions" : table})
     
-
 trainer = SFTTrainer(
     model=model,
     tokenizer=tokenizer,
@@ -210,7 +210,7 @@ trainer.add_callback(EarlyStoppingCallback(
 ))
 
 #manually init wandb run and store name
-wandb_run_name = wandb.init(entity=wandb_entity, project=wandb_project).name
+wandb_url = wandb.init(entity=wandb_entity, project=wandb_project).get_url()
 
 #start training
 trainer.train()
@@ -226,19 +226,14 @@ if post_train_config:
     for key, value in post_train_config.items():
         setattr(model_config, key, value)
 
-## Save model, tokenizer and model config locally
-trainer.model.save_pretrained(finetuned_path)
+## Save model, tokenizer and model config to folder
+trainer.model.save_pretrained(finetuned_path, safe_serialization=True)
 model_config.save_pretrained(finetuned_path)
 trainer.tokenizer.save_pretrained(finetuned_path)
 
-def create_commit_message(component:str):
-    return f"Update of {component}\n\nWandB run name: ({wandb_run_name})"
-
 #push model, config and tokenizer to hub if required
 if hf_hub_repo != None:
-    trainer.model.push_to_hub(hf_hub_repo, token=hf_token_write, commit_message=create_commit_message("LoRA adapters"))
-    model_config.push_to_hub(hf_hub_repo, token=hf_token_write, commit_message=create_commit_message("model config"))
-    trainer.tokenizer.push_to_hub(hf_hub_repo, token=hf_token_write, commit_message=create_commit_message("tokenizer"))
+    HfApi().upload_folder(repo_id=hf_hub_repo, repo_type="model", folder_path=finetuned_path, token=hf_token_write, commit_message=f"Update of model components from run\n\nLink to WandB run:\n{wandb_url}")
 
 #wait a sec to avoid simulateous access to files
 time.sleep(1)
