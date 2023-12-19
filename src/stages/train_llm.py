@@ -227,7 +227,7 @@ if post_train_config:
         setattr(model_config, key, value)
 
 ## Save model, tokenizer and model config to folder
-trainer.model.save_pretrained(finetuned_path)
+trainer.model.save_pretrained(finetuned_path, safe_serialization=True)
 model_config.save_pretrained(finetuned_path)
 trainer.tokenizer.save_pretrained(finetuned_path)
 
