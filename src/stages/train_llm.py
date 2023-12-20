@@ -10,13 +10,13 @@ from dotenv import load_dotenv
 import os
 from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, BitsAndBytesConfig, AutoConfig, PretrainedConfig, EarlyStoppingCallback
 from huggingface_hub import HfApi
+import evaluate
 import torch
 from peft import LoraConfig
 from datasets import load_from_disk
 from trl import SFTTrainer, DataCollatorForCompletionOnlyLM
 import yaml
 import wandb
-from sacrebleu import corpus_bleu
 from tqdm import tqdm
 import wandb
 import numpy as np
@@ -173,11 +173,42 @@ def generate_predictions(model, tokenizer, test_split):
 
     return predictions
 
-def test_stage(trainer: SFTTrainer):
-    predictions = generate_predictions(trainer.model, trainer.tokenizer, test_split)
-    bleu_score = corpus_bleu(predictions, [test_split[dataset_columns['answer']]]).score
+def calc_test_metrics(pred:list, ref:list) -> dict:
+    #literature:
+    #https://medium.com/@sthanikamsanthosh1994/understanding-bleu-and-rouge-score-for-nlp-evaluation-1ab334ecadcb
+    #https://towardsdatascience.com/foundations-of-nlp-explained-bleu-score-and-wer-metrics-1a5ba06d812b
 
-    trainer.log({"test_bleu": bleu_score})
+    bleu_ref = [[item] for item in ref] #prepare reference input for bleu score
+
+    #calculate bleu scores
+    bleu = evaluate.load("bleu")
+    bleu3_score = bleu.compute(predictions=pred, references=bleu_ref, max_order=3)['bleu'] #bleu score with max 3 ngrams
+    bleu4_score = bleu.compute(predictions=pred, references=bleu_ref, max_order=4)['bleu'] #bleu score with max 4 ngrams
+    bleu5_score = bleu.compute(predictions=pred, references=bleu_ref, max_order=5)['bleu'] #bleu score with max 5 ngrams
+
+    #calculate rouge scores
+    rouge_scores = evaluate.load("rouge").compute(predictions=pred, references=ref)
+
+    #return dict with wandb formatted names
+    return {
+        "test_bleu-3": bleu3_score,
+        "test_bleu-4": bleu4_score,
+        "test_bleu-5": bleu5_score,
+        "test_rouge1": rouge_scores["rouge1"],
+        "test_rouge2": rouge_scores["rouge2"],
+        "test_rougeL": rouge_scores["rougeL"],
+    }
+
+def test_stage(trainer: SFTTrainer):
+    predictions = generate_predictions(trainer.model, trainer.tokenizer, test_split) #predict
+    references = test_split[dataset_columns['answer']] #get references
+
+    print(predictions)
+    print(references)
+
+    metrics = calc_test_metrics(predictions, references) #calculate different metrics 
+
+    trainer.log(metrics) #log metrics to wandb
 
     table = wandb.Table(
         columns=["context", "question", "answer", "predictions"],
