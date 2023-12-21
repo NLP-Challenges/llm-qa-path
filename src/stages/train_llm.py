@@ -129,7 +129,7 @@ if training_split_frac < 1:
     train_split = concatenate_datasets([
         train_split.filter(lambda x: x[dataset_columns["swap_col"]] == True).train_test_split(train_size=float(training_split_frac), seed=1234)["train"],
         train_split.filter(lambda x: x[dataset_columns["swap_col"]] == False).train_test_split(train_size=float(training_split_frac), seed=1234)["train"]
-    ])
+    ]).shuffle(seed=1234)
 
 ## Start training
 train_args = TrainingArguments(
