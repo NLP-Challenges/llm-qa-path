@@ -124,11 +124,12 @@ train_split = full_dataset.filter(lambda x: x[dataset_columns['split']] == 'trai
 val_split = full_dataset.filter(lambda x: x[dataset_columns['split']] == "val") #get validation split
 test_split = full_dataset.filter(lambda x: x[dataset_columns['split']] == "test") #get test split
 
-#sample training dataset
-train_split = concatenate_datasets([
-    train_split.filter(lambda x: x[dataset_columns["swap_col"]] == True).train_test_split(train_size=training_split_frac, seed=1234)["train"],
-    train_split.filter(lambda x: x[dataset_columns["swap_col"]] == False).train_test_split(train_size=training_split_frac, seed=1234)["train"]
-])
+#sample training dataset if required
+if training_split_frac < 1:
+    train_split = concatenate_datasets([
+        train_split.filter(lambda x: x[dataset_columns["swap_col"]] == True).train_test_split(train_size=float(training_split_frac), seed=1234)["train"],
+        train_split.filter(lambda x: x[dataset_columns["swap_col"]] == False).train_test_split(train_size=float(training_split_frac), seed=1234)["train"]
+    ])
 
 ## Start training
 train_args = TrainingArguments(
