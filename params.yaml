@@ -61,10 +61,9 @@ train_llm:
 
   DatasetColumns:
     question: "question"
-    context: "context"
-    answer: "answers"
+    context: "sourced_context"
+    answer: "abstractive_answer"
     split: "split" #column where each element is "train", "val" or "test"
-    can_be_answered: "can_be_answered" #boolean column which describes if question can be answered from context.
 
 inference:
   model_params:

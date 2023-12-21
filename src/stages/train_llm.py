@@ -118,9 +118,9 @@ print(model_config)
 #load train dataset
 full_dataset = load_from_disk(ft_dataset_filename, keep_in_memory=True)
 
-train_split = full_dataset.filter(lambda x: x['split'] == 'train')#get training split
-val_split = full_dataset.filter(lambda x: x['split'] == "val") #get validation split
-test_split = full_dataset.filter(lambda x: x['split'] == "test") #get test split
+train_split = full_dataset.filter(lambda x: x[dataset_columns['split']] == 'train')#get training split
+val_split = full_dataset.filter(lambda x: x[dataset_columns['split']] == "val") #get validation split
+test_split = full_dataset.filter(lambda x: x[dataset_columns['split']] == "test") #get test split
 
 #sanity check
 assert len(full_dataset) == len(train_split) + len(val_split) + len(test_split), f"Something went wrong during the splitting process of the dataset... All the splits together have a length of {len(train_split) + len(val_split) + len(test_split)} but it has to sum up to {len(full_dataset)}"
