@@ -56,10 +56,10 @@ stages:
       - data/processed/ft_dataset_abstractive.hf
 
   train_llm:
-    cmd: python src/stages/train_llm.py train_llm data/processed/test_data.hf ./data/models/llama2-qa-fine-tuned
+    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset_abstractive.hf ./data/models/llama2-qa-fine-tuned
     deps:
       - src/stages/train_llm.py
-      - data/processed/test_data.hf
+      - data/processed/ft_dataset_abstractive.hf
     params:
       - train_llm
     outs:

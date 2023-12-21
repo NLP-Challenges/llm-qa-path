@@ -74,8 +74,8 @@ stages:
     deps:
     - path: src/stages/build_ft_dataset.py
       hash: md5
-      md5: c794b3661ce5f0793b745883bcde3833
-      size: 5542
+      md5: 7686a0b8dc4a32483acef65165e850c7
+      size: 5527
     params:
       params.yaml:
         build_tf_dataset:
@@ -87,21 +87,22 @@ stages:
     outs:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: a82c1286c9aba3a1afb98078a9de6d89.dir
-      size: 59510
+      md5: 9fdae7012dde681534dc5ea6f9988c2d.dir
+      size: 59507
       nfiles: 3
   train_llm:
-    cmd: python src/stages/train_llm.py train_llm data/processed/test_data.hf ./data/models/llama2-qa-fine-tuned
+    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset_abstractive.hf
+      ./data/models/llama2-qa-fine-tuned
     deps:
-    - path: data/processed/test_data.hf
+    - path: data/processed/ft_dataset_abstractive.hf
       hash: md5
-      md5: fdd5a3b6ce855f65c0ff402442c19b0b.dir
-      size: 10169
+      md5: 25beb7572f61ec663aaac13c910493df.dir
+      size: 123104
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: 5e2eed6a734c083b35f0eb0ae120c82f
-      size: 9403
+      md5: 5a65297d9196ffcdc90dbb09aebd7a77
+      size: 10816
     params:
       params.yaml:
         train_llm:
@@ -150,14 +151,13 @@ stages:
             bnb_4bit_compute_dtype: torch.bfloat16
           DatasetColumns:
             question: question
-            context: context
-            answer: answers
+            context: sourced_context
+            answer: abstractive_answer
             split: split
-            can_be_answered: can_be_answered
     outs:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: b3b19a04e93c106be82bc0255edb1b34.dir
+      md5: 382381ffa23a6fee58f6b35a1ee3ce63.dir
       size: 41871028
       nfiles: 9
   load_llm:
@@ -166,7 +166,7 @@ stages:
     deps:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: b3b19a04e93c106be82bc0255edb1b34.dir
+      md5: 382381ffa23a6fee58f6b35a1ee3ce63.dir
       size: 41871028
       nfiles: 9
     - path: ./data/raw/example_context.json
@@ -219,18 +219,18 @@ stages:
     deps:
     - path: data/processed/ft_dataset_source_added.hf
       hash: md5
-      md5: 20db80e9f716adde7444e570aeb095dd.dir
-      size: 3220908
+      md5: 097fe9e3043ab12cdf4997a1bab38f2d.dir
+      size: 117407
       nfiles: 3
     - path: src/stages/build_ft_dataset_gpt_answer.py
       hash: md5
-      md5: 32648a912bd3424ede6babe9a0db4503
-      size: 4161
+      md5: 9858ddd0e12b27481460343b7fe4f85d
+      size: 4249
     outs:
     - path: data/processed/ft_dataset_abstractive.hf
       hash: md5
-      md5: c115dd21723c641912e3d4cb8381a371.dir
-      size: 3646930
+      md5: 25beb7572f61ec663aaac13c910493df.dir
+      size: 123104
       nfiles: 3
   build_ft_dataset_gpt_context_add_source:
     cmd: python src/stages/build_ft_dataset_gpt_context_add_source.py data/processed/ft_dataset.hf
@@ -238,18 +238,18 @@ stages:
     deps:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: b75ea709d08be1c3e9e50ffd1ffbc01e.dir
-      size: 2946084
+      md5: 9fdae7012dde681534dc5ea6f9988c2d.dir
+      size: 59507
       nfiles: 3
     - path: src/stages/build_ft_dataset_gpt_context_add_source.py
       hash: md5
-      md5: d23af7f37763fab4c6175d324b319995
-      size: 3015
+      md5: c6303409e6cc9cebcb40bdafce3d1af1
+      size: 3384
     outs:
     - path: data/processed/ft_dataset_source_added.hf
       hash: md5
-      md5: 20db80e9f716adde7444e570aeb095dd.dir
-      size: 3220908
+      md5: 097fe9e3043ab12cdf4997a1bab38f2d.dir
+      size: 117407
       nfiles: 3
   push_model_to_hub:
     cmd: python src/stages/push_model_to_hub.py inference ./data/models/llama2-qa-fine-tuned

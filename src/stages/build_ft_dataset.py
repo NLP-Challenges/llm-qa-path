@@ -142,7 +142,7 @@ final_df = pd.concat([train_split, val_split, test_split]).sample(frac = 1, rand
 
 print("final dataset length: ", len(final_df))
 
-datasets.Dataset.from_pandas(final_df, split="train").save_to_disk(dataset_filename)
+datasets.Dataset.from_pandas(final_df).save_to_disk(dataset_filename)
 
 #wait a sec to avoid simulateous access to files
 time.sleep(1)
