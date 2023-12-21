@@ -74,12 +74,11 @@ stages:
     deps:
     - path: src/stages/build_ft_dataset.py
       hash: md5
-      md5: 7686a0b8dc4a32483acef65165e850c7
-      size: 5527
+      md5: 9947dd8c5cb9d25e053f23af0b92f5c5
+      size: 5451
     params:
       params.yaml:
         build_tf_dataset:
-          seed: 1234
           n_train: 20
           n_val: 6
           n_test: 6

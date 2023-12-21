@@ -13,7 +13,7 @@ from huggingface_hub import HfApi
 import evaluate
 import torch
 from peft import LoraConfig
-from datasets import load_from_disk
+from datasets import load_from_disk, concatenate_datasets
 from trl import SFTTrainer, DataCollatorForCompletionOnlyLM
 import yaml
 import wandb
@@ -58,6 +58,7 @@ tokenizer_id = params["tokenizer_params"]["tokenizer_id"]
 max_seq_length = params["tokenizer_params"]["max_seq_length"]
 max_new_tokens = params["tokenizer_params"]["max_new_tokens"]
 ft_dataset_filename = train_dataset_filename
+training_split_frac = params["training_config"]["training_split_frac"]
 train_batch_size = params["training_config"]["train_batch_size"]
 grad_accumulation_steps = params["training_config"]["grad_accumulation_steps"]
 optimizer = params["training_config"]["optimizer"]
@@ -123,8 +124,11 @@ train_split = full_dataset.filter(lambda x: x[dataset_columns['split']] == 'trai
 val_split = full_dataset.filter(lambda x: x[dataset_columns['split']] == "val") #get validation split
 test_split = full_dataset.filter(lambda x: x[dataset_columns['split']] == "test") #get test split
 
-#sanity check
-assert len(full_dataset) == len(train_split) + len(val_split) + len(test_split), f"Something went wrong during the splitting process of the dataset... All the splits together have a length of {len(train_split) + len(val_split) + len(test_split)} but it has to sum up to {len(full_dataset)}"
+#sample training dataset
+train_split = concatenate_datasets([
+    train_split.filter(lambda x: x[dataset_columns["swap_col"]] == True).train_test_split(train_size=training_split_frac, seed=1234)["train"],
+    train_split.filter(lambda x: x[dataset_columns["swap_col"]] == False).train_test_split(train_size=training_split_frac, seed=1234)["train"]
+])
 
 ## Start training
 train_args = TrainingArguments(

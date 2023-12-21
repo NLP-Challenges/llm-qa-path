@@ -13,6 +13,8 @@ import time
 import numpy as np
 import yaml
 
+np.random.seed(1234) 
+
 def swap_context(df:pd.DataFrame):
     """ Copy df and swap the context randomly but also change answer to 'Leider liegen mir dazu keine Informationen vor'
     Args:
@@ -57,8 +59,8 @@ def sample(df_original:pd.DataFrame, df_swapped:pd.DataFrame, size:int, fraw_swa
     n_swapped = size - n_original #calculate number of samples from swapped dataframe
 
     #sample from dataframes
-    split_original = df_original.sample(n=n_original, random_state=params["seed"])
-    split_swapped = df_swapped.sample(n=n_swapped, random_state=params["seed"])
+    split_original = df_original.sample(n=n_original, random_state=1234)
+    split_swapped = df_swapped.sample(n=n_swapped, random_state=1234)
 
     #combine
     split = pd.concat([split_original, split_swapped], ignore_index=True)
@@ -87,9 +89,6 @@ dataset_filename = args.dataset_filename
 # parse params
 with open("params.yaml", 'r') as file:
     params = yaml.safe_load(file)[params_parent_field]
-
-#set numpy seed (for swap_context)
-np.random.seed(params["seed"]) 
 
 # concatenate training and test split
 df_original:pd.DataFrame = pd.concat(
@@ -138,7 +137,7 @@ if len(np.intersect1d(train_split.context.unique(), test_split.context.unique())
 if len(np.intersect1d(val_split.context.unique(), test_split.context.unique())) > 0:
     raise Exception("Leakage between val_split and test_split")
 
-final_df = pd.concat([train_split, val_split, test_split]).sample(frac = 1, random_state=params["seed"]).reset_index(drop=True, inplace=False)
+final_df = pd.concat([train_split, val_split, test_split]).sample(frac = 1, random_state=1234).reset_index(drop=True, inplace=False)
 
 print("final dataset length: ", len(final_df))
 

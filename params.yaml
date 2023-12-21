@@ -1,5 +1,4 @@
 build_tf_dataset:
-  seed: 1234
   n_train: 20
   n_val: 6
   n_test: 6
@@ -28,6 +27,7 @@ train_llm:
     max_new_tokens: 200 #used for test stage
 
   training_config:
+    training_split_frac: 1 # 1 -> 100% of training data
     train_batch_size: 1
     grad_accumulation_steps: 1
     optimizer: "paged_adamw_32bit"
@@ -64,6 +64,7 @@ train_llm:
     context: "sourced_context"
     answer: "abstractive_answer"
     split: "split" #column where each element is "train", "val" or "test"
+    swap_col: "can_be_answered" #boolean column which shows if question can be answered
 
 inference:
   model_params:
