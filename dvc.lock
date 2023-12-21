@@ -101,8 +101,8 @@ stages:
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: 5a65297d9196ffcdc90dbb09aebd7a77
-      size: 10816
+      md5: 6a05e40bf29f5bd81e1596a657854e7f
+      size: 10822
     params:
       params.yaml:
         train_llm:
@@ -120,7 +120,7 @@ stages:
           tokenizer_params:
             tokenizer_id: flozi00/Llama-2-13b-german-assistant-v7
             max_seq_length: 4096
-            max_new_tokens: 100
+            max_new_tokens: 200
           training_config:
             train_batch_size: 1
             grad_accumulation_steps: 1
@@ -157,7 +157,7 @@ stages:
     outs:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 382381ffa23a6fee58f6b35a1ee3ce63.dir
+      md5: 004098aa80de17eb407f850c7766f1ff.dir
       size: 41871028
       nfiles: 9
   load_llm:

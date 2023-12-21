@@ -65,14 +65,14 @@ stages:
     outs:
       - ./data/models/llama2-qa-fine-tuned
 
-  load_llm:
-    cmd: python src/stages/load_llm.py inference ./data/models/llama2-qa-fine-tuned ./data/raw/example_context.json "Was ist DVC?"
-    deps:
-      - src/stages/load_llm.py
-      - ./data/models/llama2-qa-fine-tuned
-      - ./data/raw/example_context.json
-    params:
-      - inference
+#  load_llm:
+#    cmd: python src/stages/load_llm.py inference ./data/models/llama2-qa-fine-tuned ./data/raw/example_context.json "Was ist DVC?"
+#    deps:
+#      - src/stages/load_llm.py
+#      - ./data/models/llama2-qa-fine-tuned
+#      - ./data/raw/example_context.json
+#    params:
+#      - inference
 
 #  push_model_to_hub:
 #    cmd: python src/stages/push_model_to_hub.py ./data/models/llama2-qa-fine-tuned "nlpchallenges/chatbot-qa-path"

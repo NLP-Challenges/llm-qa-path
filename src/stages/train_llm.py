@@ -20,6 +20,7 @@ import wandb
 from tqdm import tqdm
 import wandb
 import numpy as np
+import dvc.api
 
 parser = argparse.ArgumentParser()
 
@@ -203,9 +204,6 @@ def test_stage(trainer: SFTTrainer):
     predictions = generate_predictions(trainer.model, trainer.tokenizer, test_split) #predict
     references = test_split[dataset_columns['answer']] #get references
 
-    print(predictions)
-    print(references)
-
     metrics = calc_test_metrics(predictions, references) #calculate different metrics 
 
     trainer.log(metrics) #log metrics to wandb
@@ -241,7 +239,7 @@ trainer.add_callback(EarlyStoppingCallback(
 ))
 
 #manually init wandb run and store name
-wandb_url = wandb.init(entity=wandb_entity, project=wandb_project).get_url()
+wandb_url = wandb.init(entity=wandb_entity, project=wandb_project, config=dvc.api.params_show(deps=True)).get_url()
 
 #start training
 trainer.train()

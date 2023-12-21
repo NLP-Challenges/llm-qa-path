@@ -25,7 +25,7 @@ train_llm:
   tokenizer_params:
     tokenizer_id: "flozi00/Llama-2-13b-german-assistant-v7"
     max_seq_length: 4096
-    max_new_tokens: 100 #used for test stage
+    max_new_tokens: 200 #used for test stage
 
   training_config:
     train_batch_size: 1
