@@ -1,9 +1,9 @@
 build_tf_dataset:
   seed: 1234
-  frac_original: null # if provided here n_original must be null
-  frac_swapped: null # if provided here n_swapped must be null
-  n_original: 1500 # if provided here frac_original must be null
-  n_swapped: 500 # if provided here frac_swapped must be null
+  n_train: 20
+  n_val: 6
+  n_test: 6
+  frac_swapped: 0.2
 
 train_llm:
   hf_hub_repo: "nlpchallenges/chatbot-qa-path" #if you want to enable hub push -> put repo name here otherwise put null
