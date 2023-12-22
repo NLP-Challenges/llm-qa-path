@@ -86,20 +86,20 @@ stages:
     deps:
     - path: src/stages/build_ft_dataset.py
       hash: md5
-      md5: 9947dd8c5cb9d25e053f23af0b92f5c5
-      size: 5451
+      md5: 5e2c5ab76795dde451fd1c4ed22b4cf5
+      size: 5607
     params:
       params.yaml:
         build_tf_dataset:
-          n_train: 20
-          n_val: 6
-          n_test: 6
-          frac_swapped: 0.2
+          n_train: 4000
+          n_val: 500
+          n_test: 200
+          frac_swapped: 0.5
     outs:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: 9fdae7012dde681534dc5ea6f9988c2d.dir
-      size: 59507
+      md5: dbeb5cacce2c9f4f0f9bd0da2ef067dc.dir
+      size: 7359251
       nfiles: 3
   train_llm:
     cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset_abstractive.hf
@@ -232,8 +232,8 @@ stages:
     deps:
     - path: data/processed/ft_dataset_source_added.hf
       hash: md5
-      md5: 097fe9e3043ab12cdf4997a1bab38f2d.dir
-      size: 117407
+      md5: 176f9881de138d06bfb3a7b5d2e0386e.dir
+      size: 14752503
       nfiles: 3
     - path: src/stages/build_ft_dataset_gpt_answer.py
       hash: md5
@@ -242,8 +242,8 @@ stages:
     outs:
     - path: data/processed/ft_dataset_abstractive.hf
       hash: md5
-      md5: 25beb7572f61ec663aaac13c910493df.dir
-      size: 123104
+      md5: bc85959b480a1f26e98039d3a35f2677.dir
+      size: 15623952
       nfiles: 3
   build_ft_dataset_gpt_context_add_source:
     cmd: python src/stages/build_ft_dataset_gpt_context_add_source.py data/processed/ft_dataset.hf
@@ -251,8 +251,8 @@ stages:
     deps:
     - path: data/processed/ft_dataset.hf
       hash: md5
-      md5: 9fdae7012dde681534dc5ea6f9988c2d.dir
-      size: 59507
+      md5: dbeb5cacce2c9f4f0f9bd0da2ef067dc.dir
+      size: 7359251
       nfiles: 3
     - path: src/stages/build_ft_dataset_gpt_context_add_source.py
       hash: md5
@@ -261,8 +261,8 @@ stages:
     outs:
     - path: data/processed/ft_dataset_source_added.hf
       hash: md5
-      md5: 097fe9e3043ab12cdf4997a1bab38f2d.dir
-      size: 117407
+      md5: 176f9881de138d06bfb3a7b5d2e0386e.dir
+      size: 14752503
       nfiles: 3
   push_model_to_hub:
     cmd: python src/stages/push_model_to_hub.py inference ./data/models/llama2-qa-fine-tuned

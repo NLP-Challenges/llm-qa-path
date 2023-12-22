@@ -58,15 +58,15 @@ stages:
     outs:
       - data/processed/ft_dataset_abstractive.hf
 
-  train_llm:
-    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset_abstractive.hf ./data/models/llama2-qa-fine-tuned
-    deps:
-      - src/stages/train_llm.py
-      - data/processed/ft_dataset_abstractive.hf
-    params:
-      - train_llm
-    outs:
-      - ./data/models/llama2-qa-fine-tuned
+#  train_llm:
+#    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset_abstractive.hf ./data/models/llama2-qa-fine-tuned
+#    deps:
+#      - src/stages/train_llm.py
+#      - data/processed/ft_dataset_abstractive.hf
+#    params:
+#      - train_llm
+#    outs:
+#      - ./data/models/llama2-qa-fine-tuned
 
 #  load_llm:
 #    cmd: python src/stages/load_llm.py inference ./data/models/llama2-qa-fine-tuned ./data/raw/example_context.json "Was ist DVC?"

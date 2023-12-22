@@ -1,8 +1,8 @@
 build_tf_dataset:
-  n_train: 20
-  n_val: 6
-  n_test: 6
-  frac_swapped: 0.2
+  n_train: 4000
+  n_val: 500
+  n_test: 200
+  frac_swapped: 0.5
 
 train_llm:
   hf_hub_repo: "nlpchallenges/chatbot-qa-path" #if you want to enable hub push -> put repo name here otherwise put null

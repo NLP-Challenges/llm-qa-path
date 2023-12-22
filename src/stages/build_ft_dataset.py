@@ -113,7 +113,8 @@ df_original.reset_index(drop=True, inplace=True)
 #add new column for "can be answered"
 df_original["can_be_answered"] = [True]*len(df_original)
 
-print("total number of question, context, answer pairs available: ", len(df_original))
+print(f"total number of observations in original dataset is {len(df_original)}")
+print(f"total number of unique context is {len(df_original.context.unique())}. To be safe keep the total length of all splits together lower than this number!")
 
 #swap context
 df_swapped = swap_context(df_original)
