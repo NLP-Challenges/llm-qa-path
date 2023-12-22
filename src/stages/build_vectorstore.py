@@ -7,11 +7,10 @@ Usage: script_name.py corpus_filename(input) embedder_filename(input) vector_dat
 
 from typing import Iterable
 from langchain.vectorstores import Chroma
-from langchain.docstore.document import Document
 import argparse
 from dill import load
 import time
-import json
+from utils.data_helpers import load_docs_from_jsonl
 
 parser = argparse.ArgumentParser()
 
@@ -26,16 +25,6 @@ args = parser.parse_args()
 corpus_filename = args.corpus_filename
 embedder_filename = args.embedder_filename
 vector_database_filename = args.vector_database_filename
-
-# Helper functions
-def load_docs_from_jsonl(file_path) -> Iterable[Document]:
-    docs = []
-    with open(file_path, 'r') as jsonl_file:
-        for line in jsonl_file:
-            data = json.loads(line)
-            obj = Document(**data)
-            docs.append(obj)
-    return docs
 
 # load corpus
 corpus = load_docs_from_jsonl(corpus_filename)

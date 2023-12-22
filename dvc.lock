@@ -10,8 +10,12 @@ stages:
       nfiles: 5
     - path: src/stages/build_corpus.py
       hash: md5
-      md5: 24ec12464570f61ff053265036733552
-      size: 4022
+      md5: b7f3044c664b52f196f1e8345bb936bf
+      size: 3805
+    - path: src/stages/utils/data_helpers.py
+      hash: md5
+      md5: 8b9fac5db9aade7dc5fe47e3ab6bb2e0
+      size: 1305
     outs:
     - path: data/processed/corpus.jsonl
       hash: md5
@@ -44,12 +48,16 @@ stages:
       size: 542838819
     - path: src/stages/build_vectorstore.py
       hash: md5
-      md5: 1c2dfe9f7e34dab5a56bb1e6b12e3bd5
-      size: 1598
+      md5: dc2900aa6529ee53ea52ce181c2e581b
+      size: 1291
+    - path: src/stages/utils/data_helpers.py
+      hash: md5
+      md5: 8b9fac5db9aade7dc5fe47e3ab6bb2e0
+      size: 1305
     outs:
     - path: data/processed/chroma
       hash: md5
-      md5: 31fa109a937cb364ad50a7fcefab727a.dir
+      md5: 13e10ef9d04241068bad0952a74d47be.dir
       size: 24078853
       nfiles: 6
   load_vectorstore:
@@ -58,7 +66,7 @@ stages:
     deps:
     - path: data/processed/chroma
       hash: md5
-      md5: 31fa109a937cb364ad50a7fcefab727a.dir
+      md5: 13e10ef9d04241068bad0952a74d47be.dir
       size: 24078853
       nfiles: 6
     - path: data/processed/embedder.pkl
@@ -67,8 +75,12 @@ stages:
       size: 542838819
     - path: src/stages/load_vectorstore.py
       hash: md5
-      md5: 241968fb40bbfb2ae255ce8cf5049a1d
-      size: 3547
+      md5: 19f0ad81e0e5b52e56f4a8fea36f8638
+      size: 2880
+    - path: src/stages/utils/data_helpers.py
+      hash: md5
+      md5: 8b9fac5db9aade7dc5fe47e3ab6bb2e0
+      size: 1305
   build_ft_dataset:
     cmd: python src/stages/build_ft_dataset.py build_tf_dataset data/processed/ft_dataset.hf
     deps:
@@ -100,8 +112,8 @@ stages:
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: 6a05e40bf29f5bd81e1596a657854e7f
-      size: 10822
+      md5: df1c1e7cb4b2f9ec644ac62fbbf8628e
+      size: 11055
     params:
       params.yaml:
         train_llm:
@@ -121,6 +133,7 @@ stages:
             max_seq_length: 4096
             max_new_tokens: 200
           training_config:
+            training_split_frac: 0.8
             train_batch_size: 1
             grad_accumulation_steps: 1
             optimizer: paged_adamw_32bit
@@ -153,10 +166,11 @@ stages:
             context: sourced_context
             answer: abstractive_answer
             split: split
+            swap_col: can_be_answered
     outs:
     - path: ./data/models/llama2-qa-fine-tuned
       hash: md5
-      md5: 004098aa80de17eb407f850c7766f1ff.dir
+      md5: d3a522fe7e21fdb1e410d65948ff93cd.dir
       size: 41871028
       nfiles: 9
   load_llm:
