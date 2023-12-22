@@ -84,33 +84,34 @@ load_dotenv()
 parser = argparse.ArgumentParser()
 
 # Add positional arguments
-parser.add_argument('train_dataset_filename_input')
-parser.add_argument('train_dataset_filename_output')
+parser.add_argument('dataset_filename_input')
+parser.add_argument('dataset_filename_output')
 
 args = parser.parse_args()
 
 # Access the arguments
-train_dataset_filename_input = args.train_dataset_filename_input
-train_dataset_filename_output = args.train_dataset_filename_output
+dataset_filename_input = args.dataset_filename_input
+dataset_filename_output = args.dataset_filename_output
 
 # load germansquad dataset (train split) and convert to pandas dataframe
-df = pd.DataFrame(load_from_disk(train_dataset_filename_input, keep_in_memory=True))
+df = pd.DataFrame(load_from_disk(dataset_filename_input, keep_in_memory=True))
 
 # Setup OpenAI API
 chat = ChatOpenAI(temperature=0, model="gpt-3.5-turbo", request_timeout=60)
 
-# Generate answers
-df["extractive_answer"] = df.answers
+#rename answers column since this contains the extractive answer
+df = df.rename(columns={"answers":"extractive_answer"}, inplace=False)
 
+## Generate abstractive answers
 # iterate over rows with iterrows()
 for index, row in tqdm(df.iterrows(), total=df.shape[0]):
     if row["can_be_answered"]:
-        df.at[index, "answers"] = generate_answer(row["question"], row["context"], row["extractive_answer"])
+        df.at[index, "abstractive_answer"] = generate_answer(row["question"], row["sourced_context"], row["extractive_answer"])
     else:
-        df.at[index, "answers"] = generate_declined_answer(row["question"], row["context"], row["extractive_answer"])
+        df.at[index, "abstractive_answer"] = generate_declined_answer(row["question"], row["sourced_context"], row["extractive_answer"])
 
 # save updated dataset
-datasets.Dataset.from_pandas(df, split="train").save_to_disk(train_dataset_filename_output)
+datasets.Dataset.from_pandas(df).save_to_disk(dataset_filename_output)
 
 #wait a sec to avoid simulateous access to files
 time.sleep(1)

@@ -6,7 +6,6 @@ Usage: script_name.py text_filename(input) curpus_filename(output)
 
 import argparse
 import os
-from typing import Iterable
 import time
 from langchain.text_splitter import HTMLHeaderTextSplitter, RecursiveCharacterTextSplitter
 from langchain.document_loaders import PyPDFLoader
@@ -14,6 +13,7 @@ from langchain.docstore.document import Document
 from langchain.vectorstores import utils as chromautils
 import pandas as pd
 from tqdm import tqdm
+from utils.data_helpers import save_docs_to_jsonl
 
 parser = argparse.ArgumentParser()
 
@@ -26,12 +26,6 @@ args = parser.parse_args()
 # Access the arguments
 data_folder_name = args.data_folder_name
 corpus_filename = args.corpus_filename
-
-# Helper functions
-def save_docs_to_jsonl(array:Iterable[Document], file_path:str, mode:str='a') -> None:
-    with open(file_path, mode=mode) as jsonl_file:
-        for doc in array:
-            jsonl_file.write(doc.json() + '\n')
 
 # Document collection
 docs = []

@@ -13,13 +13,14 @@ from huggingface_hub import HfApi
 import evaluate
 import torch
 from peft import LoraConfig
-from datasets import load_from_disk
+from datasets import load_from_disk, concatenate_datasets
 from trl import SFTTrainer, DataCollatorForCompletionOnlyLM
 import yaml
 import wandb
 from tqdm import tqdm
 import wandb
 import numpy as np
+import dvc.api
 
 parser = argparse.ArgumentParser()
 
@@ -57,6 +58,7 @@ tokenizer_id = params["tokenizer_params"]["tokenizer_id"]
 max_seq_length = params["tokenizer_params"]["max_seq_length"]
 max_new_tokens = params["tokenizer_params"]["max_new_tokens"]
 ft_dataset_filename = train_dataset_filename
+training_split_frac = params["training_config"]["training_split_frac"]
 train_batch_size = params["training_config"]["train_batch_size"]
 grad_accumulation_steps = params["training_config"]["grad_accumulation_steps"]
 optimizer = params["training_config"]["optimizer"]
@@ -118,12 +120,16 @@ print(model_config)
 #load train dataset
 full_dataset = load_from_disk(ft_dataset_filename, keep_in_memory=True)
 
-train_split = full_dataset.filter(lambda x: x['split'] == 'train')#get training split
-val_split = full_dataset.filter(lambda x: x['split'] == "val") #get validation split
-test_split = full_dataset.filter(lambda x: x['split'] == "test") #get test split
+train_split = full_dataset.filter(lambda x: x[dataset_columns['split']] == 'train')#get training split
+val_split = full_dataset.filter(lambda x: x[dataset_columns['split']] == "val") #get validation split
+test_split = full_dataset.filter(lambda x: x[dataset_columns['split']] == "test") #get test split
 
-#sanity check
-assert len(full_dataset) == len(train_split) + len(val_split) + len(test_split), f"Something went wrong during the splitting process of the dataset... All the splits together have a length of {len(train_split) + len(val_split) + len(test_split)} but it has to sum up to {len(full_dataset)}"
+#sample training dataset if required
+if training_split_frac < 1:
+    train_split = concatenate_datasets([
+        train_split.filter(lambda x: x[dataset_columns["swap_col"]] == True).train_test_split(train_size=float(training_split_frac), seed=1234)["train"],
+        train_split.filter(lambda x: x[dataset_columns["swap_col"]] == False).train_test_split(train_size=float(training_split_frac), seed=1234)["train"]
+    ]).shuffle(seed=1234)
 
 ## Start training
 train_args = TrainingArguments(
@@ -203,9 +209,6 @@ def test_stage(trainer: SFTTrainer):
     predictions = generate_predictions(trainer.model, trainer.tokenizer, test_split) #predict
     references = test_split[dataset_columns['answer']] #get references
 
-    print(predictions)
-    print(references)
-
     metrics = calc_test_metrics(predictions, references) #calculate different metrics 
 
     trainer.log(metrics) #log metrics to wandb
@@ -241,7 +244,7 @@ trainer.add_callback(EarlyStoppingCallback(
 ))
 
 #manually init wandb run and store name
-wandb_url = wandb.init(entity=wandb_entity, project=wandb_project).get_url()
+wandb_url = wandb.init(entity=wandb_entity, project=wandb_project, config=dvc.api.params_show(deps=True)).get_url()
 
 #start training
 trainer.train()

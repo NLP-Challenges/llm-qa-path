@@ -1,9 +1,8 @@
 build_tf_dataset:
-  seed: 1234
-  frac_original: null # if provided here n_original must be null
-  frac_swapped: null # if provided here n_swapped must be null
-  n_original: 1500 # if provided here frac_original must be null
-  n_swapped: 500 # if provided here frac_swapped must be null
+  n_train: 4000
+  n_val: 500
+  n_test: 200
+  frac_swapped: 0.5
 
 train_llm:
   hf_hub_repo: "nlpchallenges/chatbot-qa-path" #if you want to enable hub push -> put repo name here otherwise put null
@@ -25,17 +24,18 @@ train_llm:
   tokenizer_params:
     tokenizer_id: "flozi00/Llama-2-13b-german-assistant-v7"
     max_seq_length: 4096
-    max_new_tokens: 100 #used for test stage
+    max_new_tokens: 200 #used for test stage
 
   training_config:
-    train_batch_size: 1
-    grad_accumulation_steps: 1
+    training_split_frac: 1 # ]0, 1] 1 -> 100% of training data
+    train_batch_size: 16
+    grad_accumulation_steps: 2
     optimizer: "paged_adamw_32bit"
     learning_rate: 0.0001
-    warmup_steps: 0
-    logging_steps: 1
+    warmup_steps: 10
+    logging_steps: 5
     lr_scheduler_type: "linear"
-    num_train_epochs: 1
+    num_train_epochs: 5
     device_map: "auto"
     gradient_checkpointing: True #gradient checkpointing reduces memory overhead but increases computation overhead
     completion_only: True #only calculate the loss with respect to the completions if true
@@ -61,10 +61,10 @@ train_llm:
 
   DatasetColumns:
     question: "question"
-    context: "context"
-    answer: "answers"
+    context: "sourced_context"
+    answer: "abstractive_answer"
     split: "split" #column where each element is "train", "val" or "test"
-    can_be_answered: "can_be_answered" #boolean column which describes if question can be answered from context.
+    swap_col: "can_be_answered" #boolean column which shows if question can be answered
 
 inference:
   model_params:
