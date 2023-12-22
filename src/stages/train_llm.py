@@ -133,7 +133,7 @@ if training_split_frac < 1:
 
 ## Start training
 train_args = TrainingArguments(
-    output_dir=finetuned_path + "/train-out",
+    output_dir="./train",
     per_device_train_batch_size=train_batch_size,
     per_device_eval_batch_size=val_batch_size,
     gradient_accumulation_steps=grad_accumulation_steps,
