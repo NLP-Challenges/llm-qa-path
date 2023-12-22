@@ -28,8 +28,8 @@ train_llm:
 
   training_config:
     training_split_frac: 1 # ]0, 1] 1 -> 100% of training data
-    train_batch_size: 16
-    grad_accumulation_steps: 2
+    train_batch_size: 1
+    grad_accumulation_steps: 16
     optimizer: "paged_adamw_32bit"
     learning_rate: 0.0001
     warmup_steps: 10
@@ -42,7 +42,7 @@ train_llm:
     neftune_noise_alpha: 1 #if you want to disable NEFTune set this value to null
 
   validation_config:
-    val_batch_size: 16
+    val_batch_size: 4
     validate_every_n_steps: 1 #calculate validation metrics on val split every n steps
     early_stopping_patience: 3 #if model is not getting better within {early_stopping_patience} according to validation metric -> stop training
 
