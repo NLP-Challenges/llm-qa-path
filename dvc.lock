@@ -103,12 +103,12 @@ stages:
       nfiles: 3
   train_llm:
     cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset_abstractive.hf
-      ./data/models/llama2-qa-fine-tuned
+      ./data/models/model-fine-tuned
     deps:
     - path: data/processed/ft_dataset_abstractive.hf
       hash: md5
-      md5: 25beb7572f61ec663aaac13c910493df.dir
-      size: 123104
+      md5: bc85959b480a1f26e98039d3a35f2677.dir
+      size: 15623952
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
@@ -133,22 +133,22 @@ stages:
             max_seq_length: 4096
             max_new_tokens: 200
           training_config:
-            training_split_frac: 0.8
+            training_split_frac: 1
             train_batch_size: 1
-            grad_accumulation_steps: 1
+            grad_accumulation_steps: 16
             optimizer: paged_adamw_32bit
             learning_rate: 0.0001
-            warmup_steps: 0
+            warmup_steps: 5
             logging_steps: 1
             lr_scheduler_type: linear
-            num_train_epochs: 1
+            num_train_epochs: 2
             device_map: auto
             gradient_checkpointing: true
             completion_only: true
             neftune_noise_alpha: 1
           validation_config:
-            val_batch_size: 16
-            validate_every_n_steps: 1
+            val_batch_size: 4
+            validate_every_n_steps: 10
             early_stopping_patience: 3
           LoraConfig:
             r: 12
@@ -168,11 +168,11 @@ stages:
             split: split
             swap_col: can_be_answered
     outs:
-    - path: ./data/models/llama2-qa-fine-tuned
+    - path: ./data/models/model-fine-tuned
       hash: md5
-      md5: d3a522fe7e21fdb1e410d65948ff93cd.dir
-      size: 41871028
-      nfiles: 9
+      md5: 1d7aa19ae3f3d0a514719cf21213cbe1.dir
+      size: 162609054
+      nfiles: 22
   load_llm:
     cmd: python src/stages/load_llm.py inference ./data/models/llama2-qa-fine-tuned
       ./data/raw/example_context.json "Was ist DVC?"
