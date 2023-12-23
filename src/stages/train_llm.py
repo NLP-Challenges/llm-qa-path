@@ -153,6 +153,7 @@ train_args = TrainingArguments(
     evaluation_strategy="steps", #validate every n steps (eval_steps)
     save_strategy="steps", #checkpointing strategy must be the same as evaluation_strategy
     eval_steps=validate_every_n_steps,
+    save_steps=validate_every_n_steps, #store a checkpoint after every validation so it can be loaded correctly after training
     load_best_model_at_end=True, #if true -> the model with the lowest validation loss will be loaded after training
     metric_for_best_model="loss", #use validation loss as metric for best model 
     greater_is_better=False #we use loss as metric for best model -> lowest loss is better
