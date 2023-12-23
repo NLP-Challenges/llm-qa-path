@@ -76,6 +76,7 @@ dataset_columns = params["DatasetColumns"]
 val_batch_size = params["validation_config"]["val_batch_size"]
 validate_every_n_steps = params["validation_config"]["validate_every_n_steps"]
 early_stopping_patience = params["validation_config"]["early_stopping_patience"]
+early_stopping_threshold = params["validation_config"]["early_stopping_threshold"]
 
 ## Configuration
 lora_config = LoraConfig(
@@ -240,7 +241,8 @@ trainer = SFTTrainer(
 
 # add EarlyStoppingCallback
 trainer.add_callback(EarlyStoppingCallback(
-    early_stopping_patience=early_stopping_patience
+    early_stopping_patience=early_stopping_patience,
+    early_stopping_threshold=early_stopping_threshold
 ))
 
 #manually init wandb run and store name
