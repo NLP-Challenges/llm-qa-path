@@ -12,7 +12,7 @@ train_llm:
     project: "chatbot-qa"
 
   model_params:
-    model_id: "flozi00/Llama-2-13b-german-assistant-v7"
+    model_id: "meta-llama/Llama-2-13b-hf"
 
     pre_train_config: #do you want to alter the model config before training? If not set this parameter to null!
       use_cache: False #turn of cache to prevent problems during training!
@@ -22,7 +22,7 @@ train_llm:
       use_cache: True #turn caching back on again
 
   tokenizer_params:
-    tokenizer_id: "flozi00/Llama-2-13b-german-assistant-v7"
+    tokenizer_id: "meta-llama/Llama-2-13b-hf"
     max_seq_length: 4096
     max_new_tokens: 200 #used for test stage
 
@@ -38,7 +38,7 @@ train_llm:
     num_train_epochs: 2
     device_map: "auto"
     gradient_checkpointing: True #gradient checkpointing reduces memory overhead but increases computation overhead
-    completion_only: True #only calculate the loss with respect to the completions if true
+    completion_only: False #only calculate the loss with respect to the completions if true
     neftune_noise_alpha: null #if you want to disable NEFTune set this value to null
 
   validation_config:
