@@ -97,7 +97,10 @@ tokenizer.padding_side = "right" #define padding side
 
 
 #load config 
-model_config:PretrainedConfig = AutoConfig.from_pretrained(model_id)
+model_config:PretrainedConfig = AutoConfig.from_pretrained(
+    model_id, 
+    token=hf_token
+)
 
 print("original model config: ")
 print(model_config)
