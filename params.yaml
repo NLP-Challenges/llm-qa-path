@@ -34,18 +34,18 @@ train_llm:
     learning_rate: 0.0001
     warmup_steps: 5
     logging_steps: 1
-    lr_scheduler_type: "linear"
+    lr_scheduler_type: "constant"
     num_train_epochs: 2
     device_map: "auto"
     gradient_checkpointing: True #gradient checkpointing reduces memory overhead but increases computation overhead
     completion_only: True #only calculate the loss with respect to the completions if true
-    neftune_noise_alpha: 1 #if you want to disable NEFTune set this value to null
+    neftune_noise_alpha: null #if you want to disable NEFTune set this value to null
 
   validation_config:
     val_batch_size: 4
     validate_every_n_steps: 10 #calculate validation metrics on val split every n steps
-    early_stopping_patience: 2 #if model is not getting better within {early_stopping_patience} according to validation metric -> stop training
-    early_stopping_threshold: 0.01 #if val loss doesnt drop that much whithin {early_stopping_patience} -> stop
+    early_stopping_patience: 3 #if model is not getting better within {early_stopping_patience} according to validation metric -> stop training
+    early_stopping_threshold: 0.01 #if validation metric doesnt drop that much whithin {early_stopping_patience} -> stop
 
   LoraConfig:
     r: 12
