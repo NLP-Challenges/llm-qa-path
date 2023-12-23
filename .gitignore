@@ -1,4 +1,5 @@
 .env
 wandb
+train
 .idea
 .DS_Store
