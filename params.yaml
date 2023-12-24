@@ -45,7 +45,7 @@ train_llm:
     val_batch_size: 4
     validate_every_n_steps: 10 #calculate validation metrics on val split every n steps
     early_stopping_patience: 3 #if model is not getting better within {early_stopping_patience} according to validation metric -> stop training
-    early_stopping_threshold: 0.01 #if validation metric doesnt drop that much whithin {early_stopping_patience} -> stop
+    early_stopping_threshold: 0 #if validation metric doesnt drop that much whithin {early_stopping_patience} -> stop
 
   LoraConfig:
     r: 12

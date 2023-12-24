@@ -138,6 +138,7 @@ if training_split_frac < 1:
 ## Start training
 train_args = TrainingArguments(
     output_dir="./train",
+    overwrite_output_dir=True, #override all checkpoints at new run
     per_device_train_batch_size=train_batch_size,
     per_device_eval_batch_size=val_batch_size,
     gradient_accumulation_steps=grad_accumulation_steps,
