@@ -112,8 +112,8 @@ stages:
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: df1c1e7cb4b2f9ec644ac62fbbf8628e
-      size: 11055
+      md5: e9e0f3827077e3a83209749cdaf24651
+      size: 11402
     params:
       params.yaml:
         train_llm:
@@ -122,14 +122,14 @@ stages:
             entity: t_buess
             project: chatbot-qa
           model_params:
-            model_id: flozi00/Llama-2-13b-german-assistant-v7
+            model_id: meta-llama/Llama-2-13b-hf
             pre_train_config:
               use_cache: false
               max_position_embeddings: 4096
             post_train_config:
               use_cache: true
           tokenizer_params:
-            tokenizer_id: flozi00/Llama-2-13b-german-assistant-v7
+            tokenizer_id: meta-llama/Llama-2-13b-hf
             max_seq_length: 4096
             max_new_tokens: 200
           training_config:
@@ -140,16 +140,17 @@ stages:
             learning_rate: 0.0001
             warmup_steps: 5
             logging_steps: 1
-            lr_scheduler_type: linear
+            lr_scheduler_type: constant
             num_train_epochs: 2
             device_map: auto
             gradient_checkpointing: true
-            completion_only: true
-            neftune_noise_alpha: 1
+            completion_only: false
+            neftune_noise_alpha:
           validation_config:
             val_batch_size: 4
             validate_every_n_steps: 10
             early_stopping_patience: 3
+            early_stopping_threshold: 0
           LoraConfig:
             r: 12
             lora_alpha: 10
@@ -170,9 +171,9 @@ stages:
     outs:
     - path: ./data/models/model-fine-tuned
       hash: md5
-      md5: 1d7aa19ae3f3d0a514719cf21213cbe1.dir
-      size: 162609054
-      nfiles: 22
+      md5: 8680f96ba63321dfd37690e7fa683b05.dir
+      size: 41688848
+      nfiles: 9
   load_llm:
     cmd: python src/stages/load_llm.py inference ./data/models/llama2-qa-fine-tuned
       ./data/raw/example_context.json "Was ist DVC?"
