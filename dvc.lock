@@ -144,7 +144,7 @@ stages:
             num_train_epochs: 2
             device_map: auto
             gradient_checkpointing: true
-            completion_only: false
+            completion_only: true
             neftune_noise_alpha:
           validation_config:
             val_batch_size: 4
@@ -171,7 +171,7 @@ stages:
     outs:
     - path: ./data/models/model-fine-tuned
       hash: md5
-      md5: 8680f96ba63321dfd37690e7fa683b05.dir
+      md5: bf9ea4c1822e106642eb78c63f6fdfee.dir
       size: 41688848
       nfiles: 9
   load_llm:
