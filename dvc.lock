@@ -112,8 +112,8 @@ stages:
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: df1c1e7cb4b2f9ec644ac62fbbf8628e
-      size: 11055
+      md5: e9e0f3827077e3a83209749cdaf24651
+      size: 11402
     params:
       params.yaml:
         train_llm:
@@ -140,16 +140,17 @@ stages:
             learning_rate: 0.0001
             warmup_steps: 5
             logging_steps: 1
-            lr_scheduler_type: linear
+            lr_scheduler_type: constant
             num_train_epochs: 2
             device_map: auto
             gradient_checkpointing: true
             completion_only: true
-            neftune_noise_alpha: 1
+            neftune_noise_alpha:
           validation_config:
             val_batch_size: 4
             validate_every_n_steps: 10
             early_stopping_patience: 3
+            early_stopping_threshold: 0
           LoraConfig:
             r: 12
             lora_alpha: 10
@@ -170,9 +171,9 @@ stages:
     outs:
     - path: ./data/models/model-fine-tuned
       hash: md5
-      md5: 1d7aa19ae3f3d0a514719cf21213cbe1.dir
-      size: 162609054
-      nfiles: 22
+      md5: 214ccde834333bd3ebbb7825469e7b59.dir
+      size: 41871028
+      nfiles: 9
   load_llm:
     cmd: python src/stages/load_llm.py inference ./data/models/llama2-qa-fine-tuned
       ./data/raw/example_context.json "Was ist DVC?"
