@@ -35,11 +35,11 @@ train_llm:
     warmup_steps: 5
     logging_steps: 1
     lr_scheduler_type: "constant"
-    num_train_epochs: 2
+    num_train_epochs: 3
     device_map: "auto"
     gradient_checkpointing: True #gradient checkpointing reduces memory overhead but increases computation overhead
     completion_only: True #only calculate the loss with respect to the completions if true
-    neftune_noise_alpha: null #if you want to disable NEFTune set this value to null
+    neftune_noise_alpha: 5 #if you want to disable NEFTune set this value to null
 
   validation_config:
     val_batch_size: 4

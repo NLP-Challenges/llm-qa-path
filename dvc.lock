@@ -141,11 +141,11 @@ stages:
             warmup_steps: 5
             logging_steps: 1
             lr_scheduler_type: constant
-            num_train_epochs: 2
+            num_train_epochs: 3
             device_map: auto
             gradient_checkpointing: true
             completion_only: true
-            neftune_noise_alpha:
+            neftune_noise_alpha: 5
           validation_config:
             val_batch_size: 4
             validate_every_n_steps: 10
@@ -171,7 +171,7 @@ stages:
     outs:
     - path: ./data/models/model-fine-tuned
       hash: md5
-      md5: bf9ea4c1822e106642eb78c63f6fdfee.dir
+      md5: 6c5d273c6dc2250a6d378e17724ff66e.dir
       size: 41688848
       nfiles: 9
   load_llm:
