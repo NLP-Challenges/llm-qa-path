@@ -1,7 +1,7 @@
 --extra-index-url https://download.pytorch.org/whl/cu118
-torch
-torchvision
-torchaudio
+torch==2.1.1+cu118
+torchvision==0.16.1+cu118
+torchaudio==2.1.1+cu118
 
 dvc==3.33.3
 dvc-gdrive==2.20.0
@@ -31,4 +31,4 @@ sacrebleu==2.4.0
 #windows workaround
 --extra-index-url https://jllllll.github.io/bitsandbytes-windows-webui
 --prefer-binary
-bitsandbytes
+bitsandbytes==0.41.2.post2
