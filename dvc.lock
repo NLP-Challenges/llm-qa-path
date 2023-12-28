@@ -145,7 +145,7 @@ stages:
             device_map: auto
             gradient_checkpointing: true
             completion_only: true
-            neftune_noise_alpha:
+            neftune_noise_alpha: 5
           validation_config:
             val_batch_size: 4
             validate_every_n_steps: 10
@@ -171,7 +171,7 @@ stages:
     outs:
     - path: ./data/models/model-fine-tuned
       hash: md5
-      md5: 214ccde834333bd3ebbb7825469e7b59.dir
+      md5: 6abc34649d6c483ffcbf8c2ec2566ee0.dir
       size: 41871028
       nfiles: 9
   load_llm:
