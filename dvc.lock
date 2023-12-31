@@ -144,7 +144,7 @@ stages:
             device_map: auto
             gradient_checkpointing: true
             completion_only: true
-            neftune_noise_alpha: 5
+            neftune_noise_alpha:
           validation_config:
             val_batch_size: 4
             validate_every_n_steps: 10
@@ -164,13 +164,13 @@ stages:
           DatasetColumns:
             question: question
             context: sourced_context
-            answer: abstractive_answer
+            answer: extractive_answer
             split: split
             swap_col: can_be_answered
     outs:
     - path: ./data/models/model-fine-tuned
       hash: md5
-      md5: 298fd133b1604d492f5c2fde8959fc4c.dir
+      md5: ffedf3a26e0f1e8c1ce0331e755013d4.dir
       size: 22761172
       nfiles: 9
   load_llm:

@@ -38,7 +38,7 @@ train_llm:
     device_map: "auto"
     gradient_checkpointing: True #gradient checkpointing reduces memory overhead but increases computation overhead
     completion_only: True #only calculate the loss with respect to the completions if true
-    neftune_noise_alpha: 5 #if you want to disable NEFTune set this value to null
+    neftune_noise_alpha: null #if you want to disable NEFTune set this value to null
 
   validation_config:
     val_batch_size: 4
@@ -62,7 +62,7 @@ train_llm:
   DatasetColumns:
     question: "question"
     context: "sourced_context"
-    answer: "abstractive_answer"
+    answer: "extractive_answer"
     split: "split" #column where each element is "train", "val" or "test"
     swap_col: "can_be_answered" #boolean column which shows if question can be answered
 
