@@ -143,4 +143,4 @@ Based on these three experiments, we evaluated the models [here](evaluation_ques
 
 ## Conclusion
 
-The model that performed best in our evaluation was the German-optimized version of the Mistral-7b model. It is the one we ended up using in the [Study Bot Implementation](https://github.com/NLP-Challenges/Study-Bot).
+The model that performed best in our evaluation was based on `VAGOsolutions/SauerkrautLM-7b-v1-mistral`, thus we ended up using in the [Study Bot Implementation](https://github.com/NLP-Challenges/Study-Bot).
