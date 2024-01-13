@@ -18,6 +18,7 @@ The structure of this repository is organized as follows:
     └── requirements.txt
     └── README.md
     └── 📁eda notebooks [ℹ️ Contains notebooks for exploratory data analysis]
+    └── 📁extractor [ℹ️ Contains notebook to extract spaces data for vectorstore]
     └── dvc.lock [ℹ️ DVC lock file to ensure reproducibility]
     └── dvc.yaml [ℹ️ DVC pipeline configuration file]
     └── params.yaml [ℹ️ DVC params file for run configs]
