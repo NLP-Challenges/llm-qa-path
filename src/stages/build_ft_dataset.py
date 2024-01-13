@@ -1,6 +1,6 @@
 """
 This script is responsible for creating the llm fine-tuning dataset. The germanquad dataset (https://huggingface.co/datasets/deepset/germanquad) is currently used.
-To allow the recognition of wrong context, the context was wapped for a couple of questions and the answer replaced.
+To allow the recognition of wrong context, the context was swapped for a couple of questions and the answer replaced.
 
 Usage: script_name.py params_parent_field(input) dataset_filename(output)
 """
@@ -13,7 +13,7 @@ import time
 import numpy as np
 import yaml
 
-np.random.seed(1234) 
+np.random.seed(1234)
 
 def swap_context(df:pd.DataFrame):
     """ Copy df and swap the context randomly but also change answer to 'Leider liegen mir dazu keine Informationen vor'
@@ -58,17 +58,17 @@ def sample(df_original:pd.DataFrame, df_swapped:pd.DataFrame, size:int, fraw_swa
     n_original = int(size * (1-fraw_swapped)) #calculate number of samples from original dataframe
     n_swapped = size - n_original #calculate number of samples from swapped dataframe
 
-    #sample from dataframes
+    # sample from dataframes
     split_original = df_original.sample(n=n_original, random_state=1234)
     split_swapped = df_swapped.sample(n=n_swapped, random_state=1234)
 
-    #combine
+    # combine
     split = pd.concat([split_original, split_swapped], ignore_index=True)
 
-    #get unique contexts
+    # get unique contexts
     used_context = split.context.unique()
 
-    #drop all observations with this used context from original and swapped dataframe
+    # drop all observations with this used context from original and swapped dataframe
     df_original.drop(df_original[df_original.context.isin(used_context)].index, inplace=True)
     df_swapped.drop(df_swapped[df_swapped.context.isin(used_context)].index, inplace=True)
 
@@ -76,7 +76,7 @@ def sample(df_original:pd.DataFrame, df_swapped:pd.DataFrame, size:int, fraw_swa
 
 parser = argparse.ArgumentParser()
 
-#add positional arguments
+# add positional arguments
 parser.add_argument('params_parent_field')
 parser.add_argument('dataset_filename')
 
@@ -96,27 +96,27 @@ df_original:pd.DataFrame = pd.concat(
     ignore_index=True,
 )
 
-#remove additional context in context field like "Recht_der_Vereinigten_Staaten\n\n=== Amerikanisches Common Law ===\n'Actual context'"
+# remove additional context in context field like "Recht_der_Vereinigten_Staaten\n\n=== Amerikanisches Common Law ===\n'Actual context'"
 pattern = r'^.*?\n+\s*?={1,}.*?={1,}\s*?\n+' #pattern to search for
 df_original = df_original[df_original.context.str.contains(pattern)] #only use observations containing this pattern
 df_original["context"] = df_original.context.str.replace(pattern, '', regex=True).str.replace("\n", " ") #remove those patterns
 
-#extract text from answer filed
+# extract text from answer filed
 df_original["answers"] = df_original.answers.apply(lambda x: x["text"][0])
 
-#remove id filed
+# remove id filed
 df_original.drop(columns="id", inplace=True) 
 
-#reset index
+# reset index
 df_original.reset_index(drop=True, inplace=True)
 
-#add new column for "can be answered"
+# add new column for "can be answered"
 df_original["can_be_answered"] = [True]*len(df_original)
 
 print(f"total number of observations in original dataset is {len(df_original)}")
 print(f"total number of unique context is {len(df_original.context.unique())}. To be safe keep the total length of all splits together lower than this number!")
 
-#swap context
+# swap context
 df_swapped = swap_context(df_original)
 
 ## sampling
@@ -124,7 +124,7 @@ train_split = sample(df_original, df_swapped, params["n_train"], params["frac_sw
 val_split = sample(df_original, df_swapped, params["n_val"], params["frac_swapped"])
 test_split = sample(df_original, df_swapped, params["n_test"], params["frac_swapped"])
 
-#add new column which identifies the split
+# add new column which identifies the split
 train_split["split"] = ["train"]*len(train_split)
 val_split["split"] = ["val"]*len(val_split)
 test_split["split"] = ["test"]*len(test_split)
@@ -146,4 +146,3 @@ datasets.Dataset.from_pandas(final_df).save_to_disk(dataset_filename)
 
 #wait a sec to avoid simulateous access to files
 time.sleep(1)
-
