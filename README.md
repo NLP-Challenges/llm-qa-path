@@ -135,7 +135,7 @@ Our third experiment uses a German-optimized version of the Mistral-7b model. Th
 
 - Model Source: https://huggingface.co/VAGOsolutions/SauerkrautLM-7b-v1-mistral
 - Download: 29.12.2023
-- https://github.com/NLP-Challenges/llm-qa-path/tree/german_mistral
+- Experiment Branch: https://github.com/NLP-Challenges/llm-qa-path/tree/german_mistral
 
 ## Evaluation
 
