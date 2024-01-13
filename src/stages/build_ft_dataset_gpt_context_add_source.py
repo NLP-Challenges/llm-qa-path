@@ -77,23 +77,23 @@ df = pd.DataFrame(load_from_disk(dataset_filename_input, keep_in_memory=True))
 # Setup OpenAI API
 chat = ChatOpenAI(temperature=0, model="gpt-3.5-turbo", request_timeout=60)
 
-#extract unique context
+# extract unique context
 unique_context = df.context.unique()
 
-#chunk unique context
+# chunk unique context
 unique_context_chunked = get_chunks(unique_context)
 
-#add source to unique context
+# add source to unique context
 unique_context_sourced = gpt_formatter(unique_context_chunked)
 
-#maps context to sourced context
+# maps context to sourced context
 mapper = {unique_context[i]:unique_context_sourced[i] for i in range(len(unique_context))}
 
-#add new column with sourced context
+# add new column with sourced context
 df["sourced_context"] = [mapper[element] for element in df.context]
 
 # save updated dataset
 datasets.Dataset.from_pandas(df).save_to_disk(dataset_filename_output)
 
-#wait a sec to avoid simulateous access to files
+# wait a sec to avoid simulateous access to files
 time.sleep(1)
