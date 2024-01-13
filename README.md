@@ -36,12 +36,12 @@ The structure of this repository is organized as follows:
 
 ### Prerequisites
 
-1. **Python Environment**: Create a new virtual Python environment to ensure isolated package management (we used Python 3.11.6).
-2. **Installation**: Navigate to the repository's root directory and install the required packages:
+1. **Clone the Repository**: Clone this repository to your local machine.
+2. **Python Environment**: Create a new virtual Python environment to ensure isolated package management (we used Python 3.11.6).
+3. **Installation**: Navigate to the repository's root directory and install the required packages:
    ```bash
    pip install -r requirements.txt
    ```
-3. **Clone the Repository**: Clone this repository to your local machine.
 4. **DVC Pull**: Pull the DVC data from the remote repository:
    ```bash
    dvc pull
