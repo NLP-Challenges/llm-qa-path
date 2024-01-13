@@ -73,7 +73,7 @@ The repository uses a DVC pipeline for model fine-tuning. This approach allows f
 
 Here is a brief overview of the DVC stages used in this project, and what purpose they serve:
 
-![DVC DAG](img/DVC_dag.png)
+<img src="img/DVC_dag.png" width="400px">
 
 ### Retrieval stages
 
