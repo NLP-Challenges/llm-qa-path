@@ -1,4 +1,4 @@
-# LLM Question Answering
+# LLM Question Answering 🤖❓
 
 This repository hosts the code for the RAG-based question answering component of the Data Chatbot challenge. It focuses on using instruction-tuning to enhance various open-source language models for the specific task of question answering. The models developed are tested both quantitatively and qualitatively with a range of contexts and questions. The most effective model is subsequently integrated into the [Study Bot Implementation](https://github.com/NLP-Challenges/Study-Bot), serving as the foundation for its question-answering capabilities.
 
@@ -62,4 +62,3 @@ The repository uses a DVC pipeline for model fine-tuning. This approach allows f
    dvc repro
    ```
    This command will execute the pipeline stages defined in `dvc.yaml`, using the configurations specified in `params.yaml`.
-   
