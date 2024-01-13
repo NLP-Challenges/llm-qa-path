@@ -93,20 +93,23 @@ The aim of the fine-tuning process is to enhance a language model's proficiency 
 - build_ft_dataset_gpt_answer: Let GPT-3.5 answer the questions, either informing the user that the question is not answerable (context swapped) or generating an adequate, abstractive answer (context not swapped).
 - train_llm: Fine-tune the LLM model on the generated dataset.
 
-## Data and Models
+## Dataset, Models and Experiments
 
-FT Data (https://huggingface.co/datasets/deepset/germanquad)
+### Fine Tuning Dataset
 
-Download: 22.12.2023
-Abstractive dataset modification: 22.12.2023
+Our fine-tuning dataset is constructed from the GermanQUAD dataset, using the Fine-tuning related stages in the DVC pipeline. The dataset is split into training, validation, and test sets, with 50% of the questions being answerable with the provided context, and 50% being unanswerable.
 
-Trainingsdaten: 4000
+- Dataset Source: https://huggingface.co/datasets/deepset/germanquad
+- Download: 22.12.2023
+- Abstractive dataset modification with Pipeline: 22.12.2023
 
-Validation: 500
+The dataset includes the following sample size:
 
-Test: 200
+- Training: 4000 samples
+- Validation: 500 samples
+- Test: 200 samples
 
-jeweils 50% die beantwortet werden können mit Kontext, 50% die nicht beantwortet werden können.
+### Fine Tuning Models
 
 We ran three different experiments, each using a different language models from Hugging Face's model hub. We used the same training data built by the `build_ft_dataset*` stages in the DVC pipeline for all three experiments. For hyperparameter details, check the `params.yaml` file in each of the branches linked below.
 
