@@ -86,8 +86,8 @@ stages:
     deps:
     - path: src/stages/build_ft_dataset.py
       hash: md5
-      md5: 5e2c5ab76795dde451fd1c4ed22b4cf5
-      size: 5607
+      md5: df073314c42314e61f6ab12ca9238ba2
+      size: 5615
     params:
       params.yaml:
         build_tf_dataset:
@@ -300,7 +300,7 @@ stages:
     deps:
     - path: data/processed/chroma
       hash: md5
-      md5: 31fa109a937cb364ad50a7fcefab727a.dir
+      md5: 13e10ef9d04241068bad0952a74d47be.dir
       size: 24078853
       nfiles: 6
     - path: data/processed/embedder.pkl
@@ -309,13 +309,13 @@ stages:
       size: 542838819
     - path: src/stages/eval_retrieval_question_gen.py
       hash: md5
-      md5: 90bec23d3dd78c3f47d8e70481db81d8
-      size: 3965
+      md5: cd1226cf9d79082f349e0fe349aae09f
+      size: 4031
     outs:
     - path: data/processed/eval_retrieval_questions.parquet
       hash: md5
-      md5: a51786d2bcc858286c02dcaba362f8c7
-      size: 116501
+      md5: 649fa72e210edd714c898323d6a95c41
+      size: 130958
   eval_retrieval_metrics:
     cmd: python src/stages/eval_retrieval_metrics.py data/processed/chroma data/processed/embedder.pkl
       data/processed/eval_retrieval_questions.parquet data/processed/eval_retrieval_metrics.json
@@ -323,7 +323,7 @@ stages:
     deps:
     - path: data/processed/chroma
       hash: md5
-      md5: 31fa109a937cb364ad50a7fcefab727a.dir
+      md5: 13e10ef9d04241068bad0952a74d47be.dir
       size: 24078853
       nfiles: 6
     - path: data/processed/embedder.pkl
@@ -332,8 +332,8 @@ stages:
       size: 542838819
     - path: data/processed/eval_retrieval_questions.parquet
       hash: md5
-      md5: a51786d2bcc858286c02dcaba362f8c7
-      size: 116501
+      md5: 649fa72e210edd714c898323d6a95c41
+      size: 130958
     - path: src/stages/eval_retrieval_metrics.py
       hash: md5
       md5: f6263f27e0b1864735b0662049a781c7
@@ -341,9 +341,9 @@ stages:
     outs:
     - path: data/processed/eval_retrieval_metrics.json
       hash: md5
-      md5: 4aca5190a3368a3b21a972ea3701c228
-      size: 28
+      md5: c6b2b4c9df44175a4f5bcde21b1e7ee1
+      size: 27
     - path: data/processed/eval_retrieval_ranks.csv
       hash: md5
-      md5: 3051e49f7b7e2eb0b42b493d247c0ae6
-      size: 173837
+      md5: 3c7ec8595d3d9715d7d343c0efa75fab
+      size: 195952

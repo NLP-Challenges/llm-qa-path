@@ -42,7 +42,7 @@ bnb_config = BitsAndBytesConfig(
     load_in_8bit=True
 )
 
-sys_instruction = "Deine Aufgabe ist es EINE (PASSENDE) Frage zum user Input zu erstellen. Antworte so kurz wie möglich!"
+sys_instruction = "Erstelle zum Inhalt des nachfolgenden Input eine passende kurze Frage. Die Frage soll sich zum Inhalt beziehen. Frage nicht über Seitenzahlen oder was da zu sehen ist!"
 ###########################################################
 
 def copy_to_temp_folder(source_folder:str):

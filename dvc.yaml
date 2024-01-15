@@ -25,48 +25,48 @@ stages:
     outs:
       - data/processed/chroma
 
-  load_vectorstore:
-    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl "Was weisst du zum  Modul Vertiefende Themen der Analysis?" --strategy selfquery
-    deps:
-      - src/stages/load_vectorstore.py
-      - src/stages/utils/data_helpers.py
-      - data/processed/chroma
-      - data/processed/embedder.pkl
+#  load_vectorstore:
+#    cmd: python src/stages/load_vectorstore.py data/processed/chroma data/processed/embedder.pkl "Was weisst du zum  Modul Vertiefende Themen der Analysis?" --strategy selfquery
+#    deps:
+#      - src/stages/load_vectorstore.py
+#      - src/stages/utils/data_helpers.py
+#      - data/processed/chroma
+#      - data/processed/embedder.pkl
 
-  build_ft_dataset: #https://huggingface.co/datasets/deepset/germanquad
-    cmd: python src/stages/build_ft_dataset.py build_tf_dataset data/processed/ft_dataset.hf
-    deps:
-      - src/stages/build_ft_dataset.py
-    params:
-      - build_tf_dataset
-    outs:
-      - data/processed/ft_dataset.hf
+#  build_ft_dataset: #https://huggingface.co/datasets/deepset/germanquad
+#    cmd: python src/stages/build_ft_dataset.py build_tf_dataset data/processed/ft_dataset.hf
+#    deps:
+#      - src/stages/build_ft_dataset.py
+#    params:
+#      - build_tf_dataset
+#    outs:
+#      - data/processed/ft_dataset.hf
 
-  build_ft_dataset_gpt_context_add_source:
-    cmd: python src/stages/build_ft_dataset_gpt_context_add_source.py data/processed/ft_dataset.hf data/processed/ft_dataset_source_added.hf
-    deps:
-      - data/processed/ft_dataset.hf
-      - src/stages/build_ft_dataset_gpt_context_add_source.py
-    outs:
-      - data/processed/ft_dataset_source_added.hf
+#  build_ft_dataset_gpt_context_add_source:
+#    cmd: python src/stages/build_ft_dataset_gpt_context_add_source.py data/processed/ft_dataset.hf data/processed/ft_dataset_source_added.hf
+#    deps:
+#      - data/processed/ft_dataset.hf
+#      - src/stages/build_ft_dataset_gpt_context_add_source.py
+#    outs:
+#      - data/processed/ft_dataset_source_added.hf
 
-  build_ft_dataset_gpt_answer:
-    cmd: python src/stages/build_ft_dataset_gpt_answer.py data/processed/ft_dataset_source_added.hf data/processed/ft_dataset_abstractive.hf
-    deps:
-      - data/processed/ft_dataset_source_added.hf
-      - src/stages/build_ft_dataset_gpt_answer.py
-    outs:
-      - data/processed/ft_dataset_abstractive.hf
+#  build_ft_dataset_gpt_answer:
+#    cmd: python src/stages/build_ft_dataset_gpt_answer.py data/processed/ft_dataset_source_added.hf data/processed/ft_dataset_abstractive.hf
+#    deps:
+#      - data/processed/ft_dataset_source_added.hf
+#      - src/stages/build_ft_dataset_gpt_answer.py
+#    outs:
+#      - data/processed/ft_dataset_abstractive.hf
 
-  train_llm:
-    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset_abstractive.hf ./data/models/model-fine-tuned
-    deps:
-      - src/stages/train_llm.py
-      - data/processed/ft_dataset_abstractive.hf
-    params:
-      - train_llm
-    outs:
-      - ./data/models/model-fine-tuned
+#  train_llm:
+#    cmd: python src/stages/train_llm.py train_llm data/processed/ft_dataset_abstractive.hf ./data/models/model-fine-tuned
+#    deps:
+#      - src/stages/train_llm.py
+#      - data/processed/ft_dataset_abstractive.hf
+#    params:
+#      - train_llm
+#    outs:
+#      - ./data/models/model-fine-tuned
 
 #  load_llm:
 #    cmd: python src/stages/load_llm.py inference ./data/models/model-fine-tuned ./data/raw/example_context.json "Was ist DVC?"
@@ -85,22 +85,22 @@ stages:
 #    params:
 #      - inference
 
-#  eval_retrieval_question_gen:
-#    cmd: python src/stages/eval_retrieval_question_gen.py data/processed/chroma data/processed/embedder.pkl data/processed/eval_retrieval_questions.parquet
-#    deps:
-#      - src/stages/eval_retrieval_question_gen.py
-#      - data/processed/chroma
-#      - data/processed/embedder.pkl
-#    outs:
-#      - data/processed/eval_retrieval_questions.parquet
+  eval_retrieval_question_gen:
+    cmd: python src/stages/eval_retrieval_question_gen.py data/processed/chroma data/processed/embedder.pkl data/processed/eval_retrieval_questions.parquet
+    deps:
+      - src/stages/eval_retrieval_question_gen.py
+      - data/processed/chroma
+      - data/processed/embedder.pkl
+    outs:
+      - data/processed/eval_retrieval_questions.parquet
 
-#  eval_retrieval_metrics:
-#    cmd: python src/stages/eval_retrieval_metrics.py data/processed/chroma data/processed/embedder.pkl data/processed/eval_retrieval_questions.parquet data/processed/eval_retrieval_metrics.json data/processed/eval_retrieval_ranks.csv
-#    deps:
-#      - src/stages/eval_retrieval_metrics.py
-#      - data/processed/chroma
-#      - data/processed/embedder.pkl
-#      - data/processed/eval_retrieval_questions.parquet
-#    outs:
-#      - data/processed/eval_retrieval_metrics.json
-#      - data/processed/eval_retrieval_ranks.csv
+  eval_retrieval_metrics:
+    cmd: python src/stages/eval_retrieval_metrics.py data/processed/chroma data/processed/embedder.pkl data/processed/eval_retrieval_questions.parquet data/processed/eval_retrieval_metrics.json data/processed/eval_retrieval_ranks.csv
+    deps:
+      - src/stages/eval_retrieval_metrics.py
+      - data/processed/chroma
+      - data/processed/embedder.pkl
+      - data/processed/eval_retrieval_questions.parquet
+    outs:
+      - data/processed/eval_retrieval_metrics.json
+      - data/processed/eval_retrieval_ranks.csv
