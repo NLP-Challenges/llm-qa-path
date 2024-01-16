@@ -98,7 +98,41 @@ The aim of the fine-tuning process is to enhance a language model's proficiency 
 
 This chapter outlines the retrieval methods and technologies used, including the decision to employ ChromaDB and the implementation of alternative retrieval strategies.
 
+### ChromaDB: Choice and Advantages
 
+We chose ChromaDB for our document retrieval needs due to its several compelling features:
+
+- **Fast and Efficient**: ChromaDB is designed for high-speed retrieval, making it ideal for our use case of real-time chatbot interactions.
+- **Open Source**: It is open source and free to use.
+- **File System-Based**: This makes it easy to use, without needing to set up a database server.
+
+### How ChromaDB Works
+
+ChromaDB employs *cosine distance* as its primary metric to assess the relevance of documents in response to a query. This method differs significantly from cosine similarity, commonly used in many information retrieval systems.
+
+#### Cosine Similarity vs. Cosine Distance
+
+Cosine similarity measures the cosine of the angle between two non-zero vectors in a multidimensional space. It is defined as:
+
+$$
+\text{Cosine Similarity}(\mathbf{A}, \mathbf{B}) = \frac{\mathbf{A} \cdot \mathbf{B}}{\|\mathbf{A}\| \|\mathbf{B}\|}
+$$
+
+where $\mathbf{A}$ and $\mathbf{B}$ are vectors, $\mathbf{A} \cdot \mathbf{B}$ is their dot product, and $\|\mathbf{A}\|$ and $\|\mathbf{B}\|$ are their magnitudes.
+
+In contrast, cosine distance measures the dissimilarity between two vectors based on the cosine of the angle between them. It can be derived from cosine similarity as follows:
+
+$$
+\text{Cosine Distance}(\mathbf{A}, \mathbf{B}) = 1 - \text{Cosine Similarity}(\mathbf{A}, \mathbf{B})
+$$
+
+This formula implies that as the cosine similarity increases (vectors are closer in orientation), the cosine distance decreases, indicating a smaller difference between the vectors.
+
+#### Application in ChromaDB
+
+In ChromaDB, the cosine distance is used to rank document chunks by calculating the distance between the vector representation of the user's query and the vector representations of document chunks in the database. The vectors are embeddings of the text content, capturing semantic information. Document chunks with the smallest cosine distances to the query are considered the most relevant and are returned as search results.
+
+This approach enables ChromaDB to rank document chunks based on how closely their content matches the user's query. In the `load_vectorstore` stage, we query the top 4 most relevant chunks for the given question using `similarity_search()`, which is based on cosine distance.
 
 ## Dataset, Models and Experiments
 
