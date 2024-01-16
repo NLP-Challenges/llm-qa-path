@@ -112,8 +112,8 @@ stages:
       nfiles: 3
     - path: src/stages/train_llm.py
       hash: md5
-      md5: e9e0f3827077e3a83209749cdaf24651
-      size: 11402
+      md5: 1ae07ff5fd442cd4c2007ce2633b1b85
+      size: 11432
     params:
       params.yaml:
         train_llm:
@@ -140,7 +140,7 @@ stages:
             warmup_steps: 5
             logging_steps: 1
             lr_scheduler_type: constant
-            num_train_epochs: 2
+            num_train_epochs: 0
             device_map: auto
             gradient_checkpointing: true
             completion_only: true
@@ -170,7 +170,7 @@ stages:
     outs:
     - path: ./data/models/model-fine-tuned
       hash: md5
-      md5: ffedf3a26e0f1e8c1ce0331e755013d4.dir
+      md5: cdcf75a9c21b6ead2240c5807a4976c7.dir
       size: 22761172
       nfiles: 9
   load_llm:

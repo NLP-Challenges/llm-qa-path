@@ -254,7 +254,7 @@ trainer.add_callback(EarlyStoppingCallback(
 wandb_url = wandb.init(entity=wandb_entity, project=wandb_project, config=dvc.api.params_show(deps=True)).get_url()
 
 #start training
-trainer.train()
+#trainer.train() #dont run training this time
 
 ##test stage
 test_stage(trainer)

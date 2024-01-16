@@ -34,7 +34,7 @@ train_llm:
     warmup_steps: 5
     logging_steps: 1
     lr_scheduler_type: "constant"
-    num_train_epochs: 2
+    num_train_epochs: 0 #show that tis time no training was performed (just for wandb to show)
     device_map: "auto"
     gradient_checkpointing: True #gradient checkpointing reduces memory overhead but increases computation overhead
     completion_only: True #only calculate the loss with respect to the completions if true
