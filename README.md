@@ -46,7 +46,7 @@ The structure of this repository is organized as follows:
    ```bash
    dvc pull
    ```
-   This command will download the data and models from the data remote repository to your local machine.
+   This command will download the data and models from the data remote repository to your local machine. Make sure you have permission to access the Google Drive folder. To request acccess, contact <tobias.buess@students.fhnw.ch> with your E-Mail.
 
 ### Configuring Environment Variables
 
