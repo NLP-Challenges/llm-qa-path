@@ -46,7 +46,7 @@ The structure of this repository is organized as follows:
    ```bash
    dvc pull
    ```
-   This command will download the data and models from the data remote repository to your local machine.
+   This command will download the data and models from the data remote repository to your local machine. Make sure you have permission to access the Google Drive folder. To request acccess, contact <tobias.buess@students.fhnw.ch> with your E-Mail.
 
 ### Configuring Environment Variables
 
@@ -89,8 +89,8 @@ Purpose of the retrieval stages is to create chunks from relevant documents (Dat
 
 The aim of the fine-tuning process is to enhance a language model's proficiency in question answering. We utilize the GermanQUAD dataset, a curated and human-labeled German question-answering resource, as our foundational material. This dataset comprises questions and their corresponding contexts—extracted from Wikipedia articles—as well as answers that are directly sourced from these contexts, rendering them extractive in nature. However, our objective is to train a language model to consistently generate appropriate, abstractive answers. To transform the answers from extractive to abstractive, we employ GPT-3.5 to create suitable responses. Additionally, recognizing that some queries in a real-world setting may be unanswerable with the provided context, it's crucial to include training examples where the model informs users of its inability to answer due to current knowledge limitations. We facilitate this by swapping a portion of the dataset's context between questions (based on the `frac_swapped=0.5` parameter) and leveraging GPT-3.5 to formulate appropriate responses of non-answering.
 
-- build_ft_dataset: Load germanquad dataset, preprocess and swap context for a given fraction of the data.
-- build_ft_dataset_gpt_context_add_source: Generate reasonable sources using GPT-3.5 for the contexts.
+- build_ft_dataset: Perform train, val, test split. Load germanquad dataset, preprocess and swap context for a given fraction of the data.
+- build_ft_dataset_gpt_context_add_source: Split content into chunks and generate reasonable sources using GPT-3.5 for each chunk.
 - build_ft_dataset_gpt_answer: Let GPT-3.5 answer the questions, either informing the user that the question is not answerable (context swapped) or generating an adequate, abstractive answer (context not swapped).
 - train_llm: Fine-tune the LLM model on the generated dataset.
 
@@ -140,7 +140,9 @@ Our third experiment uses a German-optimized version of the Mistral-7b model. Th
 
 ## Evaluation
 
-Based on these three experiments, we evaluated the models [here](evaluation_question_answering.ipynb).
+To be able to provide accurate answers to the questions, it is essential that the chunks retrieved from the vectorstore are actually relevant to the question. Thus, we evaluated the retrieval performance in the notebook [evaluation_retrieval.ipynb](evaluation_retrieval.ipynb).
+
+Based on the three LLM fine-tuning experiments, we evaluated the question answering of the models in the notebook [evaluation_question_answering](evaluation_question_answering.ipynb) (NPR MC2). 
 
 ## Conclusion
 
