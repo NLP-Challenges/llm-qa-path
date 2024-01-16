@@ -140,7 +140,9 @@ Our third experiment uses a German-optimized version of the Mistral-7b model. Th
 
 ## Evaluation
 
-Based on these three experiments, we evaluated the models [here](evaluation_question_answering.ipynb).
+To be able to provide accurate answers to the questions, it is essential that the chunks retrieved from the vectorstore are actually relevant to the question. Thus, we evaluated the retrieval performance in [evaluation_retrieval.ipynb](evaluation_retrieval.ipynb)
+
+Based on the three LLM fine-tuning experiments, we evaluated the question answering of the models in [evaluation_question_answering](evaluation_question_answering.ipynb) (NPR MC2). 
 
 ## Conclusion
 
