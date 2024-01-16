@@ -80,10 +80,10 @@ Here is a brief overview of the DVC stages used in this project, and what purpos
 
 Purpose of the retrieval stages is to create chunks from relevant documents (Data Science study program documents, course materials etc.) and save them in a ChromaDB vector store, which we can later query for relevant documents given a question. The resulting ChromaDB vector store is directly used in the Chatbot implementation which can be found in the [Study Bot Repository](https://github.com/NLP-Challenges/Study-Bot).
 
-- build_corpus: Chunk the data in `data/spaces` folder and save as `corpus.jsonl` in preparation for embedding.
+- build_corpus: Chunk the data in `data/spaces` folder (PDFs and spaces.parquet) and save as `corpus.jsonl` in preparation for embedding.
 - build_embedder: Create and save the embedder model for later use.
-- build_vectorstore: Load chunked data from `corpus.jsonl` into ChromaDB.
-- load_vectorstore: Load and query the ChromaDB vectorstore.
+- build_vectorstore: Load the chunked data from `corpus.jsonl` into ChromaDB.
+- load_vectorstore: Load and query the ChromaDB vectorstore. We query the top 4 most relevant chunks for the given question using `similarity_search()`.
 
 ### Fine-tuning stages
 
