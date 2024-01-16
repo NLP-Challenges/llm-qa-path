@@ -89,8 +89,8 @@ Purpose of the retrieval stages is to create chunks from relevant documents (Dat
 
 The aim of the fine-tuning process is to enhance a language model's proficiency in question answering. We utilize the GermanQUAD dataset, a curated and human-labeled German question-answering resource, as our foundational material. This dataset comprises questions and their corresponding contexts—extracted from Wikipedia articles—as well as answers that are directly sourced from these contexts, rendering them extractive in nature. However, our objective is to train a language model to consistently generate appropriate, abstractive answers. To transform the answers from extractive to abstractive, we employ GPT-3.5 to create suitable responses. Additionally, recognizing that some queries in a real-world setting may be unanswerable with the provided context, it's crucial to include training examples where the model informs users of its inability to answer due to current knowledge limitations. We facilitate this by swapping a portion of the dataset's context between questions (based on the `frac_swapped=0.5` parameter) and leveraging GPT-3.5 to formulate appropriate responses of non-answering.
 
-- build_ft_dataset: Load germanquad dataset, preprocess and swap context for a given fraction of the data.
-- build_ft_dataset_gpt_context_add_source: Generate reasonable sources using GPT-3.5 for the contexts.
+- build_ft_dataset: Perform train, val, test split. Load germanquad dataset, preprocess and swap context for a given fraction of the data.
+- build_ft_dataset_gpt_context_add_source: Split content into chunks and generate reasonable sources using GPT-3.5 for each chunk.
 - build_ft_dataset_gpt_answer: Let GPT-3.5 answer the questions, either informing the user that the question is not answerable (context swapped) or generating an adequate, abstractive answer (context not swapped).
 - train_llm: Fine-tune the LLM model on the generated dataset.
 
