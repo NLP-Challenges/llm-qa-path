@@ -83,7 +83,7 @@ Purpose of the retrieval stages is to create chunks from relevant documents (Dat
 - build_corpus: Chunk the data in `data/spaces` folder (PDFs and spaces.parquet) and save as `corpus.jsonl` in preparation for embedding.
 - build_embedder: Create and save the embedder model for later use.
 - build_vectorstore: Load the chunked data from `corpus.jsonl` into ChromaDB.
-- load_vectorstore: Load and query the ChromaDB vectorstore. We query the top 4 most relevant chunks for the given question using `similarity_search()`.
+- load_vectorstore: Load and query the ChromaDB vectorstore. We always query the top 4 most relevant chunks for the given question using `similarity_search()`, which is based on cosine distance.
 
 ### Fine-tuning stages
 
@@ -93,6 +93,12 @@ The aim of the fine-tuning process is to enhance a language model's proficiency 
 - build_ft_dataset_gpt_context_add_source: Split content into chunks and generate reasonable sources using GPT-3.5 for each chunk.
 - build_ft_dataset_gpt_answer: Let GPT-3.5 answer the questions, either informing the user that the question is not answerable (context swapped) or generating an adequate, abstractive answer (context not swapped).
 - train_llm: Fine-tune the LLM model on the generated dataset.
+
+## Retrieval
+
+This chapter outlines the retrieval methods and technologies used, including the decision to employ ChromaDB and the implementation of alternative retrieval strategies.
+
+
 
 ## Dataset, Models and Experiments
 
